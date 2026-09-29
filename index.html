@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Layout Studio</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Jost:wght@300;400;500;600&family=Oswald:wght@300;400;600&display=swap" rel="stylesheet">
+<title>Layout Studio</title><meta name="theme-color" content="#7a4a32">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Jost:wght@300;400;500;600&family=Oswald:wght@300;400;600&family=Bodoni+Moda:wght@400;500;700&family=DM+Serif+Display&family=Lora:ital,wght@0,400;1,400&family=Inter:wght@300;400;600&family=Fraunces:wght@400;600&family=Source+Serif+4:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
 <style id="ps"></style>
 <style>
 :root{--bg:#ecebe4;--pn:#f7f6f1;--ln:#cdcabd;--tx:#2f2b20;--ac:#7a4a32;--desk:#bfbbae}
@@ -329,6 +329,230 @@ add('kick',.6,6.15,{text:'Feature'});add('head',.6,6.4,{w:7.1,h:1.2,text:'The Gl
 add('body',.6,7.8,{w:3.3,h:2.5,text:'Our signature event space features a transparent architectural design that immerses guests in the surrounding landscape while providing climate-controlled luxury.'});
 add('stat',4.2,7.75,{w:3.5});add('bul',4.2,8.85,{w:3.5,h:1.4,text:'Panoramic hillside views\nIntegrated landscaping\nSunset ceremonies'});
 commit()}
+/* ---- v2: pagination, spreads, font pairings, letterhead, more layouts ---- */
+(function(){
+var X=[.6,1.829,3.058,4.287,5.516,6.746],W2=2.258,W3=3.487,W4=4.716,W6=7.175,R=['rule',0,0,0,.02,{}];
+['Bodoni Moda','DM Serif Display','Lora','Inter','Fraunces','Source Serif 4'].forEach(function(f){FN.push(f)});
+/* pairings: [font,weight,letterspacing,leading,italic,uppercase] */
+var P=[
+{n:'Classic Editorial',head:['Playfair Display',700,-.01,.98,0,0],deck:['Cormorant Garamond',400,0,1.35,1,0],body:['Libre Baskerville',400,0,1.6,0,0],kick:['Jost',500,.22,1.2,0,1]},
+{n:'Modern Fashion',head:['Bodoni Moda',500,-.015,.95,0,0],deck:['Jost',300,.02,1.45,0,0],body:['Jost',400,0,1.55,0,0],kick:['Jost',500,.3,1.2,0,1]},
+{n:'Literary Serif',head:['DM Serif Display',400,-.005,1,0,0],deck:['Lora',400,0,1.45,1,0],body:['Lora',400,0,1.6,0,0],kick:['Inter',600,.18,1.2,0,1]},
+{n:'Contemporary Sans',head:['Oswald',600,.01,.95,0,1],deck:['Inter',300,0,1.45,0,0],body:['Inter',400,0,1.6,0,0],kick:['Inter',600,.2,1.2,0,1]},
+{n:'Photojournal',head:['Fraunces',600,-.02,.98,0,0],deck:['Source Serif 4',400,0,1.4,1,0],body:['Source Serif 4',400,0,1.6,0,0],kick:['Jost',500,.24,1.2,0,1]}];
+function ap(p,all){sync();(all?S.pages:[S.pages[S.i]]).forEach(function(q){q.els.forEach(function(e){
+var m={head:p.head,stat:p.head,deck:p.deck,body:p.body,kick:p.kick,quote:[p.head[0],400,0,1.25,1,0],cap:[p.kick[0],400,.03,1.4,0,0]}[e.t];if(!m||e.fo)return;
+e.font=m[0];e.weight=m[1];e.ls=m[2];e.lh=m[3];e.italic=m[4];if(e.t=='head'||e.t=='kick')e.upper=m[5]})});
+S.els.forEach(paint);insp();commit()}
+/* folios / running heads */
+function refoot(){var F=S.fo||{};sync();S.pages.forEach(function(q,i){q.els=q.els.filter(function(e){return!e.fo});if(!F.on||(F.sk&&i==0))return;
+var id=0,y=S.H-.5,n=(+F.st||1)+(S.sp?2*i:i);q.els.forEach(function(e){id=Math.max(id,e.id)});
+function add1(t,tx,x,al,yy){q.els.push(Object.assign({id:++id,t:t,x:x,y:yy,w:t=='cap'?1:3,h:.25,z:999,g:0,fo:1},DF,D[t],{text:tx,align:al,size:t=='cap'?8:7,color:'#6b6757',w:t=='cap'?1:3,h:.25}))}
+var sides=S.sp?[[n,'left'],[n+1,'right']]:[[n,F.pos=='r'?'right':F.pos=='o'?(n%2?'right':'left'):'center']];
+sides.forEach(function(s){var al=s[1],x=al=='left'?S.m:al=='right'?S.W-S.m-1:S.W/2-.5;
+if(!F.pos||F.pos!='n')add1('cap',String(s[0]),x,al,y);
+if(F.rh)add1('kick',F.rh,al=='center'?S.W/2-1.5:al=='left'?S.m:S.W-S.m-3,al=='center'?'center':al,.32)})});
+show(S.i,1);commit()}
+function spr(on){on=on?1:0;if((S.sp||0)==on)return;sync();S.sp=on;S.W=on?S.W*2:S.W/2;
+S.pages.forEach(function(q){q.gd=q.gd.filter(function(g){return!g.sg});if(on)q.gd.push({o:'v',p:S.W/2,sg:1})});
+S.gd=S.pages[S.i].gd;page();gds();refoot();fit()}
+var _p=pgs;pgs=function(){_p();var c=$('#pc');if(!c)return;var n=S.pages.length,F=S.fo||{},a=(+F.st||1)+(S.sp?2*S.i:S.i);
+c.textContent=S.sp?'Spread '+(S.i+1)+' of '+n+' · pp. '+a+'–'+(a+1)+' · '+2*n+' pages':'Page '+(S.i+1)+' of '+n+' · folio '+a;
+$('#fs').checked=!!S.sp;$('#fo').checked=!!F.on;$('#fp').value=F.pos||'c';$('#fn').value=F.st||1;$('#fk').checked=!!F.sk;$('#fr').value=F.rh||''};
+var b=document.createElement('div');
+b.innerHTML='<h3>Pagination &amp; spreads</h3><div id="pc" style="font-weight:600;margin-bottom:4px"></div><label><input type="checkbox" id="fs">Spread view</label><label><input type="checkbox" id="fo">Folios</label><label>Position<select id="fp"><option value="c">Centre</option><option value="o">Outside (alternating)</option><option value="r">Right</option><option value="n">None (running head only)</option></select></label><label>Start at<input type="number" id="fn" min="1"></label><label><input type="checkbox" id="fk">Skip cover</label><label>Running head<input id="fr" placeholder="Magazine · Issue"></label>'+
+'<h3>Font pairings</h3><select id="pf">'+P.map(function(p,i){return'<option value="'+i+'">'+p.n+' — '+p.head[0]+' / '+p.body[0]+'</option>'}).join('')+'</select><div class="r"><button id="pa">Apply to page</button><button id="pz_">Apply to all</button></div>';
+var lp=$('#lp'),eh=[].slice.call(lp.children).filter(function(x){return x.textContent.indexOf('Elements')==0})[0];lp.insertBefore(b,eh);
+function rd(){S.fo={on:$('#fo').checked?1:0,pos:$('#fp').value,st:+$('#fn').value||1,sk:$('#fk').checked?1:0,rh:$('#fr').value};refoot()}
+['fo','fp','fn','fk','fr'].forEach(function(i){$('#'+i).onchange=rd});$('#fs').onchange=function(){spr(this.checked)};
+$('#pa').onclick=function(){ap(P[+$('#pf').value])};$('#pz_').onclick=function(){ap(P[+$('#pf').value],1)};
+$('#pb').addEventListener('click',function(e){if(e.target.dataset.pa&&S.fo&&S.fo.on)setTimeout(refoot,0)});
+/* extra layouts */
+var ph=function(x,y,w,h,g){return['photo',x,y,w,h,{g:g}]},cp=function(x,y,w,t){return['cap',x,y,w,.4,{text:t}]};
+var T2=[
+{n:'Contents',e:[ph(X[3],-.125,W4+.6,11.125,1),kk('Inside'),['head',.6,.9,W3,1.3,{text:'Contents',size:56}],['num',.6,2.8,W3,6.4,{size:13,text:'The Long Read — 12\nPortfolio — 28\nIn Conversation — 46\nField Notes — 60\nThe Archive — 72'}]]},
+{n:'Full-bleed opener',e:[ph(-.125,-.125,8.625,11.125,0),['kick',.6,.6,W6,.3,{text:'The Feature',color:LT}],['head',.6,6.3,W6,2.4,{text:'Where the\nLight Falls',size:84,lh:.9,color:LT}],['deck',.6,8.9,W4,1,{text:'A standfirst that sets the scene in a sentence or two.',color:LT}]]},
+{n:'Photo essay',e:[kk('Portfolio'),ph(.6,1,W6,4.4,2),cp(.6,5.45,W6,'Full-width lead image; the caption sits on the grid.'),ph(.6,6.1,W3,3.4,4),ph(X[3],6.1,W3,3.4,5),cp(.6,9.55,W3,'Left caption'),cp(X[3],9.55,W3,'Right caption')]},
+{n:'Pull-quote led',e:[kk('In their words'),['quote',.6,1.1,W6,4.2,{size:44,lh:1.12,text:'The best pictures are the ones you did not plan to take.'}],['rule',.6,5.6,W6,.02,{}],['body',.6,6,W3,3.6,{text:'Body copy follows the quote, set on the grid with a drop cap to mark the entry point.'}],ph(X[3],6,W3,3.6,3)]},
+{n:'Interview Q&A',e:[ph(.6,.6,W2,9.65,1),kk('Conversation'),['head',X[2],.9,W4,1.9,{text:'A Life in\nFrames',size:46}],['deck',X[2],3,W4,1.1,{text:'The photographer on patience, printing and the long way round.'}],['body',X[2],4.4,W4,5.6,{cols:2,size:9,text:'Q. How did it begin?\nA. With a borrowed camera and a lot of free afternoons.\n\nQ. What do you look for?\nA. A quiet moment inside a busy one.'}]]},
+{n:'Gallery grid',e:[ph(.6,.6,W3,2.9,0),ph(X[3],.6,W3,2.9,1),ph(.6,3.7,W3,2.9,2),ph(X[3],3.7,W3,2.9,3),ph(.6,6.8,W3,2.9,4),ph(X[3],6.8,W3,2.9,5),cp(.6,9.85,W6,'Even gutters and a shared baseline keep a grid calm.')]},
+{n:'Overlap headline',e:[ph(-.125,-.125,8.625,6.8,3),['head',.6,4.7,W6,1.8,{text:'Golden Hour',size:96,lh:.88,color:LT}],['deck',.6,7,W3,1.4,{text:'A confident opener: type breathes over the image.'}],['body',X[3],7,W3,3,{cols:1,size:9.5,text:'Body copy in the right column, aligned to the four-column line.'}]]},
+{n:'Photo left, text right',e:[ph(-.125,-.125,4.4,11.125,4),kk('Profile'),['head',4.75,.9,3,3.2,{text:'Quiet\nHands',size:44}],['deck',4.75,4.2,3,1.6,{text:'Eight decades at the same bench.',size:15}],['body',4.75,6,3,3.9,{text:'A narrow measure of about forty characters reads comfortably at this size.'}]]},
+{n:'Letterhead',e:[['head',.6,.6,W6,.5,{text:'STUDIO NAME',font:'Jost',weight:500,size:20,ls:.3,align:'center'}],['cap',.6,1.15,W6,.3,{text:'Design · Photography · Publishing',align:'center',ls:.2,upper:1}],['rule',.6,1.65,W6,.02,{}],['cap',1.2,2.3,3,.3,{text:'Month 00, 0000',size:10,color:'#3b3628'}],['body',1.2,3,6,5.8,{size:11,lh:1.6,drop:0,align:'left',text:'Dear Name,\n\nWrite your letter here.\n\nSincerely,\n\nYour Name'}],['rule',.6,9.95,W6,.02,{}],['cap',.6,10.05,W6,.3,{text:'Address · Phone · email · website',align:'center',ls:.1}]]}];
+var h3=document.createElement('h3');h3.textContent='Creative layouts · adds a page';var g=document.createElement('div');g.id='tp2';g.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:5px';
+T2.forEach(function(t){var k=TP.push(t)-1,bt=document.createElement('button');bt.textContent=t.n;bt.style.textAlign='left';bt.onclick=function(){tpl(k)};g.appendChild(bt)});
+window.refoot=refoot;window.ap=ap;window.P=P;$('#tp').after(h3,g)})();
+
+/* ---- v3: gutters, type scale, hyphenation, letterhead doc, account sync ---- */
+(function(){
+/* gutter guides (replaces the centre-only guide) */
+window.sgd=function(){S.pages.forEach(function(q){q.gd=q.gd.filter(function(g){return!g.sg});if(S.sp){var c=S.W/2,i=S.m+(S.gu==null?.25:S.gu);[c,c-i,c+i].forEach(function(p){q.gd.push({o:'v',p:+p.toFixed(3),sg:1})})}});S.gd=S.pages[S.i].gd;gds()};
+
+window.spr=function(on){on=on?1:0;if((S.sp||0)==on)return;sync();S.sp=on;S.W=on?S.W*2:S.W/2;sgd();page();refoot();fit()};
+/* hyphenation & balanced type (screen/PDF; image export wraps by word) */
+var st=document.createElement('style');st.textContent='#pg.hy .in.body,#pg.hy .in.quote{hyphens:auto;-webkit-hyphens:auto;text-wrap:pretty;orphans:2;widows:2}#pg.hy .in.head,#pg.hy .in.deck{text-wrap:balance}';document.head.appendChild(st);document.documentElement.lang='en';
+$('#fs').onchange=function(){window.spr(this.checked)};
+/* controls */
+var b=document.createElement('div');
+b.innerHTML='<h3>Facing pages &amp; typography</h3><label>Gutter (in)<input type="number" id="gu" step=".05" min="0" value=".25"></label><label><input type="checkbox" id="hy">Hyphenate &amp; balance</label><label>Type scale<select id="ts"><option value="1">Standard</option><option value=".85">Compact</option><option value="1.15">Generous</option></select></label><div class="r"><button id="ta">Apply scale to page</button></div><h3>Letterhead</h3><div class="r"><button id="lh">New letterhead (US Letter)</button></div>';
+var lp=$('#lp'),eh=[].slice.call(lp.children).filter(function(x){return x.textContent.indexOf('Elements')==0})[0];lp.insertBefore(b,eh);
+$('#gu').onchange=function(){S.gu=+this.value;if(S.sp){sgd();commit()}};
+$('#hy').onchange=function(){S.hy=this.checked?1:0;pg.classList.toggle('hy',!!S.hy);commit()};
+var SZ={head:54,kick:9,deck:17,body:9.5,quote:22,cap:8,stat:80};
+$('#ta').onclick=function(){var k=+$('#ts').value;S.els.forEach(function(e){if(SZ[e.t]&&!e.fo){e.size=+(SZ[e.t]*k).toFixed(1);e.lh=e.t=='body'?1.6:e.lh;paint(e)}});insp();commit()};
+$('#lh').onclick=function(){sync();if(S.sp)spr(0);S.W=8.5;S.H=11;S.b=0;S.m=1;S.pages=[{els:[],gd:[]}];S.i=0;S.els=S.pages[0].els;S.gd=S.pages[0].gd;N={};art.innerHTML='';nid=0;zt=0;page();gds();
+var k=TP.length-1;TP.forEach(function(t,j){if(t.n=='Letterhead')k=j});tpl(k);fit()};
+var _pg=pgs;pgs=function(){_pg();var g=$('#gu');if(g){g.value=S.gu==null?.25:S.gu;$('#hy').checked=!!S.hy;pg.classList.toggle('hy',!!S.hy)}};
+/* account sync via the viewer's private per-user store */
+var db=null,uid=null,tm=null,busy=0,pend=0,meta=null,C=120000,box=document.createElement('div');
+box.innerHTML='<h3>Account sync</h3><div id="cs" style="margin-bottom:4px">Local only (open on claude.ai and sign in to sync)</div><div class="r"><button id="cu">Save now</button><button id="cd">Load cloud copy</button></div>';
+lp.insertBefore(box,lp.firstChild);
+var say=function(t){$('#cs').textContent=t},col=function(){return db.collection('data/users/'+uid)};
+async function save(){if(!db)return;if(busy){pend=1;return}busy=1;say('Saving…');
+try{var s=full(),n=Math.ceil(s.length/C),old=meta?meta.n:0,i;
+for(i=0;i<n;i++)await col().doc('ls_'+i).set({d:s.slice(i*C,(i+1)*C)});
+for(i=n;i<old;i++)await col().doc('ls_'+i).delete();
+meta={n:n,t:Date.now()};await col().doc('ls_meta').set(meta);
+try{localStorage.setItem('lst',meta.t)}catch(e){}say('Synced '+new Date(meta.t).toLocaleTimeString())}catch(e){say('Sync failed — will retry on your next change')}
+busy=0;if(pend){pend=0;dirty()}}
+function dirty(){if(!db)return;clearTimeout(tm);tm=setTimeout(save,4000)}
+async function pull(){if(!db)return 0;say('Loading…');try{var m=await col().doc('ls_meta').get();if(!m.exists){say('No cloud copy yet');return 0}
+meta=m.data();var s='';for(var i=0;i<meta.n;i++)s+=(await col().doc('ls_'+i).get()).data().d;
+var v=JSON.parse(s);IM=v.IM||{};FT=v.FT||{};fonts();load(v.S);hi=-1;H.length=0;commit();try{localStorage.setItem('lst',meta.t)}catch(e){}
+fit();say('Loaded copy from '+new Date(meta.t).toLocaleString());return 1}catch(e){say('Could not load cloud copy');return 0}}
+var _c=commit;commit=function(){_c();dirty()};
+$('#cu').onclick=save;$('#cd').onclick=pull;
+try{claude.use('db').then(async function(d){if(!d)return;var u=await claude.use('user');if(!u)return;db=d;uid=await u.id();
+var m=await col().doc('ls_meta').get(),loc=+(localStorage.getItem('lst')||0);
+if(m.exists){meta=m.data();if(!loc||!localStorage.getItem('ls')){await pull()}else if(meta.t>loc)say('Newer cloud copy ('+new Date(meta.t).toLocaleString()+') — press Load cloud copy')
+else say('Signed in · synced')}else{say('Signed in · saving your first cloud copy');save()}}).catch(function(){})}catch(e){}
+})();
+
+/* ---- v4: tabs, thumbnails, preflight, styles, focal point, autofit, new-project ---- */
+(function(){
+var css=document.createElement('style');css.textContent='#tbs{display:flex;gap:2px;margin:-4px -4px 8px;position:sticky;top:-10px;background:var(--pn);z-index:2}#tbs button{flex:1;border:0;border-bottom:2px solid var(--ln);border-radius:0;padding:6px 2px}#tbs .on{border-color:var(--ac);color:var(--ac);font-weight:600}.tab[hidden]{display:none}#th{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:6px 0}.tn{position:relative;border:2px solid var(--ln);background:#f3efe3;cursor:pointer;overflow:hidden}.tn.on{border-color:var(--ac)}.tn i{position:absolute;display:block}.tn b{position:absolute;left:0;right:0;bottom:0;text-align:center;font:600 9px system-ui;background:rgba(0,0,0,.55);color:#fff}#pfo div{padding:3px 0;border-bottom:1px solid var(--ln);cursor:pointer}';document.head.appendChild(css);
+var lp=$('#lp');[].slice.call(lp.children).forEach(function(n){if(n.tagName=='DIV'&&!n.id&&n.querySelector('h3')){while(n.firstChild)lp.insertBefore(n.firstChild,n);n.remove()}});var kids=[].slice.call(lp.children),G={Pages:'p',Pagination:'p',Font:'d',Facing:'d',Layers:'d',Elements:'a',Templates:'a',Creative:'a',Letterhead:'a',Account:'j'},T={},cur='p',bar=document.createElement('div');bar.id='tbs';
+[['p','Pages'],['d','Design'],['a','Add'],['j','Project']].forEach(function(t){var d=document.createElement('div');d.className='tab';d.id='tab_'+t[0];d.hidden=t[0]!='p';T[t[0]]=d;var b=document.createElement('button');b.textContent=t[1];b.dataset.t=t[0];b.className=t[0]=='p'?'on':'';bar.appendChild(b)});
+kids.forEach(function(n){if(/^H3$/.test(n.tagName)){var w=n.textContent.split(/[\s·&]/)[0];cur=G[w]||cur}T[cur].appendChild(n)});
+lp.appendChild(bar);['p','d','a','j'].forEach(function(k){lp.appendChild(T[k])});lp.insertBefore(bar,lp.firstChild);
+bar.onclick=function(e){var k=e.target.dataset.t;if(!k)return;[].forEach.call(bar.children,function(b){b.classList.toggle('on',b.dataset.t==k)});for(var x in T)T[x].hidden=x!=k};
+/* thumbnails */
+var th=document.createElement('div');th.id='th';T.p.insertBefore(th,T.p.firstChild);
+function thumbs(){var r=S.H/S.W;th.innerHTML=S.pages.map(function(p,i){return'<div class="tn'+(i==S.i?' on':'')+'" draggable="true" data-i="'+i+'" style="aspect-ratio:'+(1/r)+'">'+(p.els||[]).filter(function(e){return!e.fo}).map(function(e){var c=e.t=='photo'?'#8f9c9a':e.t=='box'||e.t=='rule'?e.fill||'#555':'rgba(60,55,40,.45)';return'<i style="left:'+e.x/S.W*100+'%;top:'+e.y/S.H*100+'%;width:'+e.w/S.W*100+'%;height:'+Math.max(e.h,.05)/S.H*100+'%;background:'+c+'"></i>'}).join('')+'<b>'+(i+1)+'</b></div>'}).join('')}
+var dg=-1;th.onclick=function(e){var n=e.target.closest('.tn');if(n)show(+n.dataset.i)};
+th.ondragstart=function(e){var n=e.target.closest('.tn');if(n)dg=+n.dataset.i};th.ondragover=function(e){e.preventDefault()};
+th.ondrop=function(e){e.preventDefault();var n=e.target.closest('.tn');if(!n||dg<0)return;var t=+n.dataset.i;sync();var p=S.pages.splice(dg,1)[0];S.pages.splice(t,0,p);dg=-1;show(t,1);if(S.fo&&S.fo.on)refoot();else commit()};
+var _p=pgs;pgs=function(){_p();thumbs()};
+/* autosave indicator */
+var as=document.createElement('span');as.id='as';as.style.opacity='.6';$('#top').appendChild(as);
+var _c=commit;commit=function(){_c();as.textContent='Saved '+new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})};
+/* style, focal, autofit */
+var K=['font','size','weight','lh','ls','color','align','italic','upper','cols'],CS=null,b=document.createElement('div');
+b.innerHTML='<h3>Selected element</h3><div class="r"><button id="sc1">Copy style</button><button id="sc2">Paste style</button><button id="sc3">Match all of this type</button><button id="sf">Fit text to box</button></div><label>Photo focus<select id="fc"><option value="">Centre</option><option value="50% 20%">Top (faces)</option><option value="50% 80%">Bottom</option><option value="20% 50%">Left</option><option value="80% 50%">Right</option></select></label>';
+T.d.appendChild(b);
+$('#sc1').onclick=function(){if(!sel)return;CS={};K.forEach(function(k){CS[k]=sel[k]})};
+$('#sc2').onclick=function(){if(!sel||!CS)return;K.forEach(function(k){sel[k]=CS[k]});paint(sel);insp();commit()};
+$('#sc3').onclick=function(){if(!sel)return;sync();S.pages.forEach(function(q){q.els.forEach(function(e){if(e.t==sel.t&&!e.fo){K.forEach(function(k){e[k]=sel[k]});if(N[e.id]&&S.els.indexOf(e)>-1)paint(e)}})});commit()};
+$('#sf').onclick=function(){if(!sel||TX.indexOf(sel.t)<0)return;var lo=4,hi=200,m,i=N[sel.id].firstChild;for(var j=0;j<12;j++){m=(lo+hi)/2;sel.size=m;paint(sel);if(i.scrollHeight<=i.clientHeight+1&&i.scrollWidth<=i.clientWidth+1)lo=m;else hi=m}sel.size=+lo.toFixed(1);paint(sel);insp();commit()};
+$('#fc').onchange=function(){if(sel&&sel.t=='photo'){sel.pos=this.value;paint(sel);commit()}};
+var _pt=paint;paint=function(e){_pt(e);if(e.t=='photo'&&e.pos){var i=N[e.id].querySelector('img');if(i)i.style.objectPosition=e.pos}};
+/* preflight + new project */
+var j=document.createElement('div');
+j.innerHTML='<h3>New project</h3><label>Trim size<select id="ns"><option value="mag">Magazine 8.375×10.875</option><option value="a4">A4</option><option value="a5">A5</option><option value="let">US Letter</option><option value="tab">Tabloid</option><option value="sq">Square 9×9</option></select></label><label>Pages<input type="number" id="np" value="8" min="1" max="200"></label><div class="r"><button id="nb">Create (replaces current)</button></div><h3>Preflight</h3><div class="r"><button id="pfb">Run check</button></div><div id="pfo">Checks margins, empty photos, image resolution and text overflow.</div>';
+T.j.appendChild(j);
+var arm=0;$('#nb').onclick=function(){var b=this;if(!arm){arm=1;b.textContent='Click again to replace';setTimeout(function(){arm=0;b.textContent='Create (replaces current)'},3000);return}arm=0;b.textContent='Create (replaces current)';
+var r=PR[$('#ns').value],n=Math.max(1,+$('#np').value||1),u=S.u;S=S0();S.u=u;S.W=r[0];S.H=r[1];S.pages=[];for(var i=0;i<n;i++)S.pages.push({els:[],gd:[]});S.fo={on:1,pos:'o',st:1,sk:1,rh:''};load(S);refoot();fit()};
+$('#pfb').onclick=async function(){sync();var o=[],cw=N;S.pages.forEach(function(q,i){q.els.forEach(function(e){if(e.fo)return;var lab='p.'+(i+1)+' '+D[e.t].n;
+if(TX.indexOf(e.t)>-1&&(e.x<S.m-.01||e.y<S.m-.01||e.x+e.w>S.W-S.m+.01||e.y+e.h>S.H-S.m+.01))o.push([i,lab+': outside margins']);
+if(e.t=='photo'&&!IM[e.src])o.push([i,lab+': empty placeholder'])})});
+for(var i=0;i<S.pages.length;i++)for(var e of S.pages[i].els){if(e.t=='photo'&&IM[e.src]){var im=new Image();im.src=IM[e.src];try{await im.decode()}catch(x){}var d=im.naturalWidth/e.w;if(d&&d<150)o.push([i,'p.'+(i+1)+' Photo: only '+Math.round(d)+' dpi (aim for 300)'])}}
+S.els.forEach(function(e){if(TX.indexOf(e.t)>-1&&N[e.id]){var f=N[e.id].firstChild;if(f.scrollHeight>f.clientHeight+2)o.push([S.i,'p.'+(S.i+1)+' '+D[e.t].n+': text overflows its box'])}});
+$('#pfo').innerHTML=o.length?o.map(function(x){return'<div data-p="'+x[0]+'">⚠ '+esc(x[1])+'</div>'}).join(''):'✓ No issues found'};
+$('#pfo').onclick=function(e){var p=e.target.dataset.p;if(p!=null)show(+p)};
+})();
+
+/* ---- v5: smart snap, real spreads, master page, crop marks/booklet print, Supabase auth, pinch zoom ---- */
+(function(){
+var CF=window.LS_CONFIG||{};
+/* smart snapping to other elements' edges and centres */
+var _TV=TV,_TH=TH;
+TV=function(){var t=_TV();S.els.forEach(function(e){if(e!==sel&&!e.fo)t.push(e.x,e.x+e.w,e.x+e.w/2)});return t};
+TH=function(){var t=_TH();S.els.forEach(function(e){if(e!==sel&&!e.fo)t.push(e.y,e.y+e.h,e.y+e.h/2)});return t};
+/* real two-page spreads: merge page pairs into one canvas, split back on exit */
+window.spr=function(on){on=on?1:0;if((S.sp||0)==on)return;sync();var W=S.W,P=S.pages,np=[];
+P.forEach(function(q){q.els=q.els.filter(function(e){return!e.fo})});
+if(on){for(var i=0;i<P.length;i+=2)np.push({els:P[i].els.concat((P[i+1]?P[i+1].els:[]).map(function(e){return Object.assign({},e,{x:e.x+W})})),gd:[]});S.W=W*2;S.i=Math.floor(S.i/2)}
+else{var h=W/2;P.forEach(function(q){var L=[],R=[];q.els.forEach(function(e){if(e.x+e.w/2<h)L.push(e);else R.push(Object.assign({},e,{x:e.x-h}))});np.push({els:L,gd:[]},{els:R,gd:[]})});S.W=h;S.i*=2}
+np.forEach(function(q){q.els.forEach(function(e,j){e.id=j+1})});
+S.pages=np;S.sp=on;S.els=np[S.i].els;S.gd=np[S.i].gd;sgd();page();refoot();fit()};
+/* master page */
+var lp=$('#lp'),tj=$('#tab_j'),ta=$('#tab_a'),m=document.createElement('div');
+m.innerHTML='<h3>Master page</h3><div class="r"><button id="m1">Add selected to master</button><button id="m2">Apply to all pages</button><button id="m3">Clear master</button></div><label><input type="checkbox" id="mk" checked>Skip first page</label><div id="mt" style="opacity:.7"></div>';
+ta.appendChild(m);
+function mt(){$('#mt').textContent=((S&&S.mst)||[]).length+' master element(s)'}
+$('#m1').onclick=function(){if(!sel||sel.fo)return;sel.ma=1;(S.mst=S.mst||[]).push(Object.assign({},sel));mt();commit()};
+$('#m2').onclick=function(){sync();S.pages.forEach(function(q,i){q.els=q.els.filter(function(e){return!e.ma||q.els===S.els&&e.ma&&S.mst.every(function(x){return x.id!=e.id})&&false});if($('#mk').checked&&i==0)return;var id=0;q.els.forEach(function(e){id=Math.max(id,e.id)});(S.mst||[]).forEach(function(x){q.els.push(Object.assign({},x,{id:++id,ma:1,z:0}))})});show(S.i,1);commit()};
+$('#m3').onclick=function(){sync();S.mst=[];S.pages.forEach(function(q){q.els=q.els.filter(function(e){return!e.ma})});show(S.i,1);mt();commit()};
+/* print: crop marks + printer's spreads */
+var pr=document.createElement('div');
+pr.innerHTML='<h3>Print &amp; press PDF</h3><label><input type="checkbox" id="cm" checked>Crop marks</label><label>Order<select id="po"><option value="r">Reading order</option><option value="b">Printer\'s spreads (saddle-stitch)</option></select></label><div class="r"><button id="pb2">Print / Save PDF</button></div><div style="opacity:.7">Tip: set margins to None and enable background graphics. Booklet page counts pad to a multiple of 4.</div>';
+tj.appendChild(pr);
+var css=document.createElement('style');css.textContent='@media print{#pp .sh{position:relative;overflow:hidden;background:#fff;break-after:page}#pp .sh #pg{break-after:auto!important}#pp .bx{position:absolute;overflow:hidden}#pp .sh svg{position:absolute;left:0;top:0}}#sc{-webkit-tap-highlight-color:transparent}@media(max-width:860px){#tbs button{padding:12px 2px}#th{grid-template-columns:repeat(4,1fr)}button,select,input{min-height:36px}}';document.head.appendChild(css);
+$('#pb2').onclick=function(){sync();var cu=S.i,b=S.b,W=S.W,H=S.H,k=96,mk=$('#cm').checked,sl=mk?b+.35:b,cl=[],pp=$('#pp'),bo=$('#po').value=='b'&&!S.sp,sd=[];
+for(var i=0;i<S.pages.length;i++){show(i,1);cl.push(pg.cloneNode(true))}show(cu,1);pp.innerHTML='';
+if(bo){var n=Math.ceil(cl.length/4)*4;for(var s=0;s<n/4;s++)sd.push([n-1-2*s,2*s],[2*s+1,n-2-2*s])}else cl.forEach(function(c,i){sd.push([i])});
+var sw=2*sl+W*(bo?2:1),sh=2*sl+H;
+sd.forEach(function(pair){var d=document.createElement('div');d.className='sh';d.style.cssText='width:'+sw*k+'px;height:'+sh*k+'px';
+pair.forEach(function(ix,j){var c=cl[ix];if(!c)return;var w=document.createElement('div');w.className='bx',lf=j==0;
+if(bo){w.style.cssText='left:'+(lf?sl-b:sl+W)*k+'px;top:'+(sl-b)*k+'px;width:'+(W+b)*k+'px;height:'+(H+2*b)*k+'px';c.style.marginLeft=(lf?0:-b*k)+'px'}
+else w.style.cssText='left:'+(sl-b)*k+'px;top:'+(sl-b)*k+'px;width:'+(W+2*b)*k+'px;height:'+(H+2*b)*k+'px';
+w.appendChild(c);d.appendChild(w)});
+if(mk){var x0=sl,x1=sl+W*(bo?2:1),y0=sl,y1=sl+H,o=b+.0625,L=.2,p='';
+[[x0,-1],[x1,1]].forEach(function(a){[[y0,-1],[y1,1]].forEach(function(c){p+='M'+(a[0]+a[1]*o)+' '+c[0]+'h'+a[1]*L+'M'+a[0]+' '+(c[0]+c[1]*o)+'v'+c[1]*L})});
+if(bo)[[y0,-1],[y1,1]].forEach(function(c){p+='M'+(sl+W)+' '+(c[0]+c[1]*o)+'v'+c[1]*L});
+d.insertAdjacentHTML('beforeend','<svg width="'+sw*k+'" height="'+sh*k+'" viewBox="0 0 '+sw+' '+sh+'"><path d="'+p+'" stroke="#000" stroke-width=".01" fill="none"/></svg>')}
+pp.appendChild(d)});
+$('#ps').textContent='@page{size:'+sw+'in '+sh+'in;margin:0}';window.print()};
+window.addEventListener('afterprint',function(){page()});
+/* pinch zoom (touch) */
+var pd=0,pz0=1;sc.addEventListener('touchstart',function(e){if(e.touches.length==2){pd=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);pz0=z}},{passive:true});
+sc.addEventListener('touchmove',function(e){if(e.touches.length==2&&pd){e.preventDefault();zoom(pz0*Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY)/pd)}},{passive:false});
+sc.addEventListener('touchend',function(){pd=0});
+/* Supabase email accounts (only when config.js has a URL + anon key) */
+var sb=null,user=null,tm=null,sv=0,ac=document.createElement('div');
+ac.innerHTML='<h3>Account</h3><div id="ac"></div><div id="am" style="opacity:.7;margin-top:4px"></div>';tj.insertBefore(ac,tj.firstChild);ac.hidden=true;
+function am(t){$('#am').textContent=t}
+function ui(){var h=$('#ac');if(!CF.url){h.textContent='Cloud accounts are off. Add your Supabase URL and anon key to config.js.';return}
+if(!sb){h.textContent='Loading…';return}
+if(user){h.innerHTML='<div>Signed in as <b></b></div><div class="r"><button id="a1">Save now</button><button id="a2">Load cloud copy</button><button id="a3">Sign out</button></div>';h.querySelector('b').textContent=user.email}
+else{h.innerHTML='<label>Email<input id="ae" type="email" autocomplete="email"></label><label>Password<input id="ap" type="password" autocomplete="current-password"></label><div class="r"><button id="b1">Sign in</button><button id="b2">Create account</button><button id="b3">Email me a link</button></div>'}}
+function cred(){return{email:$('#ae').value.trim(),password:$('#ap').value}}
+$('#ac').onclick=async function(e){var i=e.target.id,r;if(!i||!sb)return;
+try{if(i=='b1'){r=await sb.auth.signInWithPassword(cred());am(r.error?r.error.message:'')}
+else if(i=='b2'){r=await sb.auth.signUp(cred());am(r.error?r.error.message:'Check your email to confirm, then sign in.')}
+else if(i=='b3'){r=await sb.auth.signInWithOtp({email:cred().email,options:{emailRedirectTo:location.origin+location.pathname}});am(r.error?r.error.message:'Link sent — open it on this device.')}
+else if(i=='a1')save();else if(i=='a2')pull(1);else if(i=='a3')await sb.auth.signOut()}catch(x){am('Something went wrong — check your connection.')}};
+async function save(){if(!user||sv)return;sv=1;am('Saving…');var t=new Date().toISOString();
+var r=await sb.from('projects').upsert({user_id:user.id,name:'main',data:full(),updated_at:t},{onConflict:'user_id,name'});
+if(!r.error)try{localStorage.setItem('lst2',t)}catch(e){}am(r.error?'Save failed: '+r.error.message:'Saved to your account '+new Date().toLocaleTimeString());sv=0}
+async function pull(force){var r=await sb.from('projects').select('data,updated_at').eq('name','main').maybeSingle();
+if(r.error){am('Load failed: '+r.error.message);return}
+if(!r.data){am('No cloud copy yet — saving this one.');save();return}
+var loc=localStorage.getItem('lst2')||'';if(!force&&loc&&r.data.updated_at<=loc)return;
+var v=JSON.parse(r.data.data);IM=v.IM||{};FT=v.FT||{};fonts();load(v.S);hi=-1;H.length=0;commit();try{localStorage.setItem('lst2',r.data.updated_at)}catch(e){}fit();am('Loaded your cloud copy.')}
+var _c=commit;commit=function(){_c();if(user){clearTimeout(tm);tm=setTimeout(save,5000)}};
+ui();
+if(CF.url&&CF.key){var hs=[].slice.call(tj.children).filter(function(n){return n.tagName=='H3'&&/Account sync/.test(n.textContent)})[0];
+if(hs){var n=hs;for(var q=0;q<3&&n;q++){var nx=n.nextElementSibling;n.hidden=true;n=nx}}
+var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js';
+s.onload=function(){sb=supabase.createClient(CF.url,CF.key,{auth:{persistSession:true,detectSessionInUrl:true}});
+sb.auth.onAuthStateChange(function(ev,ses){user=ses?ses.user:null;ui();if(user&&(ev=='SIGNED_IN'||ev=='INITIAL_SESSION'))pull(0)});ui()};
+s.onerror=function(){am('Could not load the Supabase library.')};document.head.appendChild(s)}
+
+/* PWA */
+
+})();
+
 try{var sv=JSON.parse(localStorage.getItem('ls'));if(sv&&sv.S){IM=sv.IM||{};FT=sv.FT||{};fonts();load(sv.S);commit()}else start()}catch(e){start()}
 setTimeout(fit,60);
 </script>
