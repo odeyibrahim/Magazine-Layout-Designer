@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Layout Studio</title><meta name="theme-color" content="#7a4a32">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Jost:wght@300;400;500;600&family=Oswald:wght@300;400;600&family=Bodoni+Moda:wght@400;500;700&family=DM+Serif+Display&family=Lora:ital,wght@0,400;1,400&family=Inter:wght@300;400;600&family=Fraunces:wght@400;600&family=Source+Serif+4:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+<title>Layout Studio</title><link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#7a4a32"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><link rel="apple-touch-icon" href="icon-192.png"><link rel="icon" href="icon-192.png"><script src="config.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Jost:wght@300;400;500;600&family=Oswald:wght@300;400;600&family=Bodoni+Moda:wght@400;500;700&family=DM+Serif+Display&family=Lora:ital,wght@0,400;1,400&family=Inter:wght@300;400;600&family=Fraunces:wght@400;600&family=Source+Serif+4:ital,wght@0,400;1,400&family=Montserrat:wght@500;700;800&family=Merriweather:ital,wght@0,300;0,400;0,700;1,400&family=Libre+Caslon+Text:wght@400;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style id="ps"></style>
 <style>
 :root{--bg:#ecebe4;--pn:#f7f6f1;--ln:#cdcabd;--tx:#2f2b20;--ac:#7a4a32;--desk:#bfbbae}
@@ -286,7 +286,7 @@ function el1(x,e,k,b){var q=k/PX,X=(e.x+b)*k,Y=(e.y+b)*k,W=e.w*k,Hh=e.h*k,fs=e.s
 x.save();x.globalAlpha=e.op/100;x.beginPath();if(x.roundRect)x.roundRect(X,Y,W,Hh,e.rad*q);else x.rect(X,Y,W,Hh);x.clip();
 if(e.t=='photo'&&!IM[e.src]){var g=x.createLinearGradient(0,Y,0,Y+Hh);g.addColorStop(0,PG[e.g][0]);g.addColorStop(1,PG[e.g][1]);x.fillStyle=g;x.fillRect(X,Y,W,Hh)}
 else if(e.fill){x.fillStyle=e.fill;x.fillRect(X,Y,W,Hh)}
-if(e.t=='photo'&&IM[e.src]){var m=IMG[e.src],s=(e.fit=='cover'?Math.max:Math.min)(W/m.width,Hh/m.height),dw=m.width*s,dh=m.height*s;x.drawImage(m,X+(W-dw)/2,Y+(Hh-dh)/2,dw,dh)}
+if(e.t=='photo'&&IM[e.src]){var m=IMG[e.src],s=(e.fit=='cover'?Math.max:Math.min)(W/m.width,Hh/m.height),dw=m.width*s,dh=m.height*s;var pxx=(e.px==null?50:e.px)/100,pyy=(e.py==null?50:e.py)/100,zm=e.zm||1,ox=W*pxx,oy=Hh*pyy,x0=(W-dw)*pxx,y0=(Hh-dh)*pyy;x.drawImage(m,X+ox+zm*(x0-ox),Y+oy+zm*(y0-oy),dw*zm,dh*zm)}
 if(TX.indexOf(e.t)>-1){var cn=e.cols||1,gp=.25*k,cw=(W-gp*(cn-1))/cn,li=e.t=='num'||e.t=='bul',ind=li?fs*(e.t=='num'?2.3:1.2):0,bl=[],tx=e.upper?e.text.toUpperCase():e.text,cap='',capw=0,ty=Y,CF='400 '+fs*4.4+'px "Playfair Display",serif';
 x.textBaseline='alphabetic';x.font=(e.italic?'italic ':'')+e.weight+' '+fs+'px "'+e.font+'",Georgia,serif';if('letterSpacing' in x)x.letterSpacing=e.ls*fs+'px';
 if(e.t=='quote'){x.fillStyle=e.ac;x.fillRect(X,Y,W,2*q);ty=Y+12*q;Hh-=12*q}
@@ -520,7 +520,7 @@ sc.addEventListener('touchmove',function(e){if(e.touches.length==2&&pd){e.preven
 sc.addEventListener('touchend',function(){pd=0});
 /* Supabase email accounts (only when config.js has a URL + anon key) */
 var sb=null,user=null,tm=null,sv=0,ac=document.createElement('div');
-ac.innerHTML='<h3>Account</h3><div id="ac"></div><div id="am" style="opacity:.7;margin-top:4px"></div>';tj.insertBefore(ac,tj.firstChild);ac.hidden=true;
+ac.innerHTML='<h3>Account</h3><div id="ac"></div><div id="am" style="opacity:.7;margin-top:4px"></div>';tj.insertBefore(ac,tj.firstChild);
 function am(t){$('#am').textContent=t}
 function ui(){var h=$('#ac');if(!CF.url){h.textContent='Cloud accounts are off. Add your Supabase URL and anon key to config.js.';return}
 if(!sb){h.textContent='Loading…';return}
@@ -550,7 +550,77 @@ sb.auth.onAuthStateChange(function(ev,ses){user=ses?ses.user:null;ui();if(user&&
 s.onerror=function(){am('Could not load the Supabase library.')};document.head.appendChild(s)}
 
 /* PWA */
+if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol))navigator.serviceWorker.register('sw.js').catch(function(){});
+})();
 
+/* ---- v6: crop/pan/zoom, reference layouts, mobile ---- */
+(function(){
+['Montserrat','Merriweather','Libre Caslon Text','DM Sans'].forEach(function(f){FN.push(f)});
+var tA=$('#tab_a'),tD=$('#tab_d');
+/* pairings from references */
+P.push({n:'Alpine Travel',head:['Montserrat',800,0,1.02,0,1],deck:['Merriweather',400,0,1.5,1,0],body:['Merriweather',400,0,1.55,0,0],kick:['Montserrat',700,.12,1.2,0,1]},
+{n:'Architect Studio',head:['Libre Caslon Text',400,.02,1,0,1],deck:['Libre Caslon Text',400,.02,1.4,0,0],body:['Libre Caslon Text',400,0,1.55,0,0],kick:['Libre Caslon Text',400,.06,1.3,0,1]},
+{n:'Art Book',head:['Libre Caslon Text',400,-.01,1.05,0,0],deck:['Libre Caslon Text',400,0,1.4,1,0],body:['Libre Caslon Text',400,0,1.5,0,0],kick:['Inter',500,.12,1.2,0,1]},
+{n:'Modern Editorial',head:['DM Sans',500,-.03,1,0,0],deck:['DM Sans',600,0,1.4,0,0],body:['DM Sans',400,0,1.5,0,0],kick:['DM Sans',600,.14,1.2,0,1]});
+$('#pf').innerHTML=P.map(function(p,i){return'<option value="'+i+'">'+p.n+' — '+p.head[0]+' / '+p.body[0]+'</option>'}).join('');
+/* ---- crop / pan / zoom inside the frame ---- */
+var cm=0,ct=null;
+var _pt6=paint;paint=function(e){_pt6(e);if(e.t!='photo')return;var i=N[e.id].querySelector('img');if(!i)return;var px=e.px,py=e.py;if(px==null&&e.pos){var a=e.pos.split(' ');px=parseFloat(a[0]);py=parseFloat(a[1])}if(px==null)px=50;if(py==null)py=50;
+i.style.objectPosition=px+'% '+py+'%';i.style.transformOrigin=px+'% '+py+'%';i.style.transform='scale('+(e.zm||1)+')'};
+var b=document.createElement('div');
+b.innerHTML='<h3>Photo crop</h3><div class="r"><button id="cb">Crop / pan photo</button><button id="cr">Reset</button></div><label>Zoom<input type="range" id="cz" min="1" max="5" step=".01" value="1"></label><div style="opacity:.7">In crop mode: drag to reposition, pinch / wheel / slider to zoom. Double-click a photo to start.</div>';
+tD.insertBefore(b,tD.firstChild);
+function crop(on){cm=on&&sel&&sel.t=='photo'?1:0;pg.classList.toggle('crop',!!cm);$('#cb').textContent=cm?'Done cropping':'Crop / pan photo';fab()}
+function setZ(v){if(!sel||sel.t!='photo')return;sel.zm=Math.max(1,Math.min(5,v));$('#cz').value=sel.zm;paint(sel);clearTimeout(ct);ct=setTimeout(commit,400)}
+$('#cb').onclick=function(){crop(!cm)};$('#cz').oninput=function(){setZ(+this.value)};
+$('#cr').onclick=function(){if(sel&&sel.t=='photo'){sel.px=sel.py=50;sel.zm=1;sel.pos='';paint(sel);$('#cz').value=1;commit()}};
+$('#fc').onchange=function(){if(sel&&sel.t=='photo'){var a=this.value?this.value.split(' '):['50%','50%'];sel.px=parseFloat(a[0]);sel.py=parseFloat(a[1]);sel.pos='';paint(sel);commit()}};
+art.addEventListener('dblclick',function(){if(sel&&sel.t=='photo')crop(1)});
+art.addEventListener('pointerdown',function(ev){if(!cm||!sel||sel.t!='photo')return;var n=N[sel.id];if(!n.contains(ev.target))return;var i=n.querySelector('img');if(!i||!i.naturalWidth)return;ev.stopPropagation();ev.preventDefault();
+var sx=ev.clientX,sy=ev.clientY,p0=sel.px==null?50:sel.px,q0=sel.py==null?50:sel.py,W=n.offsetWidth,Hh=n.offsetHeight,k=n.getBoundingClientRect().width/W,zz=sel.zm||1,s=Math.max(W/i.naturalWidth,Hh/i.naturalHeight),ox=i.naturalWidth*s*zz-W,oy=i.naturalHeight*s*zz-Hh;
+function mv(m){if(ox>1)sel.px=Math.max(0,Math.min(100,p0-(m.clientX-sx)/k/ox*100));if(oy>1)sel.py=Math.max(0,Math.min(100,q0-(m.clientY-sy)/k/oy*100));paint(sel)}
+function up(){removeEventListener('pointermove',mv);removeEventListener('pointerup',up);commit()}addEventListener('pointermove',mv);addEventListener('pointerup',up)},true);
+art.addEventListener('wheel',function(e){if(cm&&sel){e.preventDefault();setZ((sel.zm||1)*Math.exp(-e.deltaY/400))}},{passive:false});
+var pd2=0,z0=1,dist=function(e){return Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY)};
+sc.addEventListener('touchstart',function(e){if(cm&&sel&&e.touches.length==2){e.stopPropagation();pd2=dist(e);z0=sel.zm||1}},{capture:true,passive:true});
+sc.addEventListener('touchmove',function(e){if(cm&&sel&&pd2&&e.touches.length==2){e.stopPropagation();e.preventDefault();setZ(z0*dist(e)/pd2)}},{capture:true,passive:false});
+sc.addEventListener('touchend',function(){pd2=0},true);
+addEventListener('keydown',function(e){if(e.key=='Escape'&&cm)crop(0)});
+/* ---- mobile: contextual action bar, view menu, panel dismissal ---- */
+var fb=document.createElement('div');fb.id='fab';fb.innerHTML='<button data-a="s">Style</button><button data-a="c">Crop</button><button data-a="d">Copy</button><button data-a="x">Delete</button>';document.body.appendChild(fb);
+function fab(){fb.classList.toggle('on',!!sel);fb.querySelector('[data-a=c]').hidden=!(sel&&sel.t=='photo');fb.querySelector('[data-a=c]').textContent=cm?'Done':'Crop'}
+fb.onclick=function(e){var a=e.target.dataset.a;if(a=='s')$('#app').dataset.s='r';else if(a=='c')crop(!cm);else if(a=='d')dup();else if(a=='x')del()};
+var _sel=select;select=function(e){_sel(e);if(cm&&(!sel||sel.t!='photo'))crop(0);$('#cz').value=sel&&sel.zm||1;fab()};
+var vw=document.createElement('button');vw.id='vw';vw.textContent='View';vw.onclick=function(){$('#top').classList.toggle('vo')};$('#top').insertBefore(vw,$('#top').children[1]);
+sc.addEventListener('pointerdown',function(e){if(innerWidth<=860&&$('#app').dataset.s&&$('#app').dataset.s!='f'&&(e.target===sc||e.target===sz))$('#app').dataset.s=''});
+var css=document.createElement('style');css.textContent='#pg.crop .el.sel{outline-style:dashed!important;cursor:grab}#pg.crop .hd{display:none}#fab,#vw{display:none}button{touch-action:manipulation}@media(max-width:860px){#vw{display:inline-block}#top label{display:none}#top.vo{flex-wrap:wrap;overflow:visible;white-space:normal}#top.vo label{display:flex}#fab.on{display:flex;position:fixed;left:8px;right:8px;bottom:calc(54px + env(safe-area-inset-bottom,0px));z-index:10;gap:6px;background:var(--pn);border:1px solid var(--ln);border-radius:10px;padding:6px;box-shadow:0 4px 16px rgba(0,0,0,.3)}#fab button{flex:1;min-height:42px}#lp,#rp{max-height:62vh}#tb button{min-height:46px}}@media(max-width:860px) and (orientation:landscape){#lp,#rp{top:0;bottom:calc(46px + env(safe-area-inset-bottom,0px));height:auto;max-height:none;width:min(340px,55vw);left:auto;right:0}#lp{left:0;right:auto}#fab.on{left:auto;width:min(360px,60vw)}}';document.head.appendChild(css);
+/* ---- reference layouts (spreads, positions traced from your images) ---- */
+var F1=[107,88,970,685],F2=[45,122,675,578],F3=[47,37,648,440];
+function Q(F,t,a,b_,c,d,p){var w=F[2]-F[0],h=F[3]-F[1];return[t,(a-F[0])/w*16.75,(b_-F[1])/h*10.875,(c-a)/w*16.75,(d-b_)/h*10.875,p||{}]}
+var MS='Montserrat',MW='Merriweather',GD='#c8a26a',DK='#232323',CS='Libre Caslon Text',DS='DM Sans',
+H={font:MS,weight:800,upper:1,size:36,lh:1.02,color:DK,ls:0},SU={font:MS,weight:700,size:20,lh:1.1,color:DK,upper:0,ls:0},B={font:MW,size:9,lh:1.55,align:'justify',drop:0,color:'#2b2b2b',weight:400},
+L='Massa sed elementum tempus egestas. Cursus risus at ultrices mi tempus imperdiet nulla malesuada. Suscipit adipiscing bibendum est ultricies integer quis auctor. Risus commodo viverra maecenas accumsan.\n\nOdio morbi quis commodo odio aenean sed. Sem fringilla ut morbi tincidunt augue interdum. Consectetur lorem donec massa sapien faucibus et molestie ac feugiat. Egestas erat imperdiet sed euismod.',L2=L+'\n\n'+L;
+var f=function(){return F1},q=function(t,a,b_,c,d,p){return Q(F1,t,a,b_,c,d,p)},bd=function(a,b_,c,d,x){return q('body',a,b_,c,d,Object.assign({},B,{text:x||L}))},sb=function(a,b_,c,d,t,o){return q('head',a,b_,c,d,Object.assign({},SU,{text:t},o))};
+var TS=[
+{n:'Alone in Norway',e:[q('photo',183,300,723,631,{g:0}),q('head',183,133,333,200,Object.assign({},H,{text:'ALONE IN\nNORWAY'})),q('rule',117,205,333,211,{fill:DK}),q('deck',572,133,895,205,{font:MS,weight:700,size:30,lh:1.25,color:GD,italic:0,text:'Seeing the world\nis what everyone wants.'}),sb(735,300,895,326,'Find your way'),bd(735,333,895,545,L2),q('cap',735,616,895,634,{font:MW,weight:700,size:8.5,color:DK,text:'Village by the lake — Tobias Bjørkli'})]},
+{n:'Four-column feature',e:[q('photo',117,465,957,685,{g:2}),q('head',183,133,494,200,Object.assign({},H,{text:'SLOVENIA IS A\nCYCLING PARADISE'})),q('rule',183,208,494,214,{fill:DK}),q('deck',568,138,890,207,{font:MW,italic:1,size:10.5,lh:1.6,color:GD,weight:400,text:'Slovenia provides a unique opportunity to explore the local scenery on two wheels. The cycling infrastructure is immensely developed here.'}),q('rule',568,208,890,214,{fill:DK})].concat([[183,'Take a break'],[343,'New experiences'],[568,'Enjoy the best'],[735,'Amazing places']].reduce(function(a,c){return a.concat([sb(c[0],237,c[0]+155,262,c[1],{size:17}),bd(c[0],268,c[0]+152,365,L)])},[]))},
+{n:'Photo spine + gold quote',e:[q('photo',343,135,724,631,{g:3}),q('box',654,165,800,255,{fill:'#f7f6f1'}),q('quote',664,175,795,248,{font:MW,weight:700,italic:0,size:10.5,lh:1.5,color:GD,align:'right',text:'If you want to get a high-quality photo, it is best to arrive early in the morning.'}),sb(183,137,335,162,'Drava Biking Trail'),bd(183,168,335,375,L),q('head',183,455,335,635,Object.assign({},SU,{size:27,lh:1.3,color:GD,text:'Biking in\nSlovenia\nhas\nchanged\nme forever.'})),sb(735,335,895,362,'Must know'),bd(735,368,895,632,L2)]},
+{n:'Contents (knock-out)',bg:'#e3e0d7',e:[q('photo',117,90,957,380,{g:4}),q('head',117,262,957,470,Object.assign({},H,{size:235,lh:.8,upper:0,ls:-.02,color:'#e3e0d7',text:'Contents'}))].concat([[183,'05','Norway'],[343,'12','Slovenia'],[568,'23','South Africa'],[735,'37','Nepal']].reduce(function(a,c){return a.concat([q('stat',c[0],488,c[0]+120,545,{font:MS,weight:800,size:52,color:DK,lh:1,text:c[1]}),sb(c[0],553,c[0]+155,572,c[2],{size:13}),bd(c[0],576,c[0]+152,640,L,)])},[]))},
+{n:'Text left, hero right',e:[q('photo',532,90,957,685,{g:3}),q('head',652,133,893,202,Object.assign({},H,{size:30,color:GD,text:'SOUTH AFRICA\nVIBES & MOOD'})),q('rule',652,206,957,211,{fill:GD}),bd(183,133,335,392,L),bd(343,133,522,250,L),sb(343,258,522,283,'Lion’s Head',{size:17}),bd(343,290,522,600,L2),sb(183,405,335,430,'Map it out',{size:17}),bd(183,438,335,632,L)]},
+{n:'Full spread + text column',e:[q('photo',117,90,695,685,{g:2}),q('quote',734,133,890,192,{font:MW,weight:700,italic:0,size:10.5,lh:1.45,color:DK,text:'“We had about an hour at our disposal, for it was clear that the capricious mountain would soon hide its face.”'}),bd(734,205,890,628,L2)]},
+{n:'Full-bleed overlay',e:[q('photo',117,90,957,685,{g:5}),q('head',183,555,420,625,Object.assign({},H,{size:30,color:'#fff',text:'SOUTH AFRICA\nVIBES & MOOD'})),q('rule',117,628,417,634,{fill:'#fff'}),sb(735,137,890,160,'Reflections',{size:17,color:'#fff'}),bd(735,167,890,250,L,).concat?bd(735,167,890,250,L):0].filter(Boolean)},
+{n:'Art book (grey paper)',bg:'#dedbd2',e:[Q(F2,'photo',75,190,330,392,{g:0}),Q(F2,'cap',95,140,335,182,{font:CS,size:6.5,color:DK,text:'FOR STUDY PURPOSES ONLY.\nNOT FOR REPRODUCTION'}),Q(F2,'body',163,413,330,505,{font:CS,size:9,lh:1.4,align:'justify',drop:0,color:DK,text:L}),Q(F2,'cap',70,510,165,556,{font:CS,size:6,lh:1.3,color:DK,text:'11. For a beautiful account of the audience experience of Behavior Tableaux performances.'}),Q(F2,'body',478,143,655,262,{font:CS,size:9,lh:1.4,align:'justify',drop:0,color:DK,text:L}),Q(F2,'cap',388,264,472,292,{font:CS,size:6,lh:1.3,color:DK,text:'12. Lowry, Twist Pulp Up-Chairs on One Mellon Plaza, Pittsburgh Press.'}),Q(F2,'photo',370,286,660,505,{g:1})]},
+{n:'Modern editorial (sans)',e:[Q(F3,'head',90,55,340,140,{font:DS,weight:500,size:50,lh:1,upper:0,ls:-.03,color:'#111',text:'À fleur\nde pavé'}),Q(F3,'deck',90,188,340,236,{font:DS,weight:600,size:10.5,lh:1.4,italic:0,color:'#111',text:'Two gardeners share their taste for beauty on a terrace rebuilt around nature in the heart of the city.'}),Q(F3,'photo',78,240,338,412,{g:4}),Q(F3,'body',372,60,485,320,{font:DS,size:8,lh:1.5,align:'left',drop:0,color:'#222',text:L2}),Q(F3,'photo',495,58,625,322,{g:3}),Q(F3,'body',495,326,625,412,{font:DS,size:8,lh:1.5,align:'left',drop:0,color:'#222',text:L})]}];
+var K={font:CS,size:6.5,ls:.04,upper:1,lh:1.35,color:'#1d1d1d',weight:400},kk3=function(x,y,w,t,o){return['kick',x,y,w,.6,Object.assign({},K,{text:t},o)]},
+hdr=[kk3(.6,.55,2.3,'LETTER OF APPOINTMENT\nHUDSON FARMHOUSE\nDATE 01.10.2024'),kk3(3.3,.55,2,'185 ALMEDA ROAD\nGARRISON, NY\n10524'),kk3(5.5,.55,2.3,'INFO@GARRISONFOUNDRY.COM\n+(1) 759-0431'),['head',.6,2.2,3,.9,{font:CS,size:20,lh:1,upper:1,weight:400,ls:0,text:'GARRISON\nFOUNDRY'}]];
+var LT2=[{n:'Architect letterhead',e:hdr.concat([kk3(.6,4.4,2.3,'GARRISON, NY\n4,900 SQ FT\nCOMPLETION 2018'),kk3(3.3,4.4,2,'JOSEPH MARTIN\nAND JENNIFER\nKOMOROWSKI'),kk3(5.5,4.4,2.3,'185 ALMEDA ROAD\nGARRISON, NY\n10524',{weight:700}),['rule',.6,5.2,7.2,.01,{}],['body',.6,5.5,2,.9,{font:CS,size:8,lh:1.4,drop:0,align:'left',text:'Attn:\nJoseph Martin\n185 Almeda Road\nGarrison, NY'}],kk3(3.3,5.5,4.4,'LAYOUT UPDATES\nMATERIAL REFINEMENT',{weight:700}),['body',3.3,6.2,4.5,3.8,{font:CS,size:8.5,lh:1.55,drop:0,align:'justify',text:L}]])},
+{n:'Project sheet (photo)',e:hdr.concat([kk3(.6,4.05,2.3,'GARRISON, NY\n4,900 SQ FT'),kk3(3.3,4.05,2,'JOSEPH MARTIN\nAND JENNIFER'),kk3(5.5,4.05,2.3,'185 ALMEDA ROAD\nGARRISON, NY',{weight:700}),['photo',0,4.85,8.375,6.025,{g:3}],['box',5.6,9.4,2.6,1.2,{fill:'#d9d2c6'}]])}];
+var h3=document.createElement('h3');h3.textContent='Reference layouts · spreads';var g=document.createElement('div');g.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:5px';
+function tplS(t){$('#app').dataset.s='';if(!S.sp)spr(1);sync();if(S.els.length){S.pages.splice(S.i+1,0,{els:[],gd:[]});show(S.i+1,1);sgd()}if(t.bg){S.bg=t.bg;page()}var kx=S.W/16.75,ky=S.H/10.875;t.e.forEach(function(a){add(a[0],a[1]*kx,a[2]*ky,Object.assign({},a[5],{w:a[3]*kx,h:a[4]*ky}))});select(null);if(S.fo&&S.fo.on)refoot();else commit()}
+function bt(t,fn){var x=document.createElement('button');x.textContent=t.n;x.style.textAlign='left';x.onclick=fn;g.appendChild(x)}
+TS.forEach(function(t){bt(t,function(){tplS(t)})});LT2.forEach(function(t){var k=TP.push(t)-1;bt(t,function(){tpl(k)})});
+tA.insertBefore(g,tA.firstChild);tA.insertBefore(h3,g);
+fab();
 })();
 
 try{var sv=JSON.parse(localStorage.getItem('ls'));if(sv&&sv.S){IM=sv.IM||{};FT=sv.FT||{};fonts();load(sv.S);commit()}else start()}catch(e){start()}
