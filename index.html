@@ -833,6 +833,180 @@ ren();
 
 try{var sv=JSON.parse(localStorage.getItem('ls'));if(sv&&sv.S){IM=sv.IM||{};FT=sv.FT||{};fonts();load(sv.S);commit()}else start()}catch(e){start()}
 setTimeout(fit,60);
+/* ---- v8: page numbers on every page, desktop pinch-zoom, mobile-first UI, 14 more reference layouts ----
+   */
+(function(){
+var $=function(s){return document.querySelector(s)},A=$('#app'),tb=$('#tb');
+var mv=$('meta[name=viewport]');if(mv)mv.content+=',maximum-scale=1,user-scalable=no';
+
+/* ================= CSS ================= */
+var st=document.createElement('style');st.textContent=
+'#pn{display:none}#lg8{display:grid;grid-template-columns:1fr 1fr;gap:5px}#lg8 button{text-align:left}body.sh #fab{display:none!important}'+
+'@media(max-width:860px){.dsk,.cn,#rt,#rl{display:none!important}'+
+'#top{flex-wrap:nowrap;overflow-x:auto;gap:4px;padding:6px 8px;min-height:54px;align-items:center}#top .g{border:0;padding:0}#top button,#top summary{min-height:42px;min-width:42px;border-radius:10px}'+
+'#pn{display:flex;gap:2px;align-items:center}#pl{min-width:52px;text-align:center;font-weight:600}'+
+'#cv{grid-template:1fr/1fr;margin-bottom:calc(60px + env(safe-area-inset-bottom,0px))}'+
+'#tb{display:flex;height:calc(60px + env(safe-area-inset-bottom,0px));padding-bottom:env(safe-area-inset-bottom,0px);z-index:30}'+
+'#tb button{flex:1;display:flex;flex-direction:column;gap:3px;align-items:center;justify-content:center;font-size:10px;line-height:1;border:0;border-radius:0;background:none;color:var(--tx);opacity:.65}#tb button i{font:normal 19px/1 system-ui}#tb button.on{color:var(--ac);opacity:1;font-weight:600}'+
+'#lp,#rp{bottom:calc(60px + env(safe-area-inset-bottom,0px));height:46dvh;max-height:none;padding:0 14px 16px;border-radius:18px 18px 0 0;overscroll-behavior:contain;z-index:20}'+
+'#lp::before,#rp::before{content:"";display:block;position:sticky;top:0;z-index:6;height:30px;margin:0 -14px 4px;background:linear-gradient(var(--ln),var(--ln)) center/42px 4px no-repeat,var(--pn)}'+
+'#tbs{display:none}'+
+'#app[data-s="l"] #cv,#app[data-s="r"] #cv{margin-bottom:calc(60px + 46dvh + env(safe-area-inset-bottom,0px))}'+
+'#fab.on{bottom:calc(68px + env(safe-area-inset-bottom,0px))}#fab button{min-height:46px;border-radius:10px}'+
+'aside label{grid-template-columns:104px 1fr;margin:9px 0}aside input:not([type=checkbox]),aside select,aside textarea{min-height:42px;padding:6px 10px;border-radius:10px}'+
+'aside button{min-height:42px;border-radius:10px}#th{grid-template-columns:repeat(3,1fr)}'+
+'dialog{width:100vw;max-width:100vw;margin:auto 0 0;border-radius:18px 18px 0 0;padding-bottom:calc(16px + env(safe-area-inset-bottom,0px))}}'+
+'@media(max-width:860px) and (orientation:landscape){#lp,#rp{top:0;left:auto;right:0;height:auto;width:min(340px,50vw);border-radius:0}#app[data-s="l"] #cv,#app[data-s="r"] #cv{margin-bottom:calc(60px + env(safe-area-inset-bottom,0px));margin-right:min(340px,50vw)}}';
+document.head.appendChild(st);
+
+/* ================= PAGE NUMBERS ================= */
+var FS0={font:'Jost',size:8,color:'#6b6757',weight:400};
+function hasFo(o){return o.pages.some(function(q){return q.els.some(function(e){return e.fo})})}
+function applyFs(){var F=S&&S.fo;if(!F||!F.fs)return;S.pages.forEach(function(q){q.els.forEach(function(e){if(!e.fo)return;Object.assign(e,F.fs);e.z=1e9;if(q.els===S.els&&N[e.id])paint(e)})})}
+function zfix(){zt=0;S.pages.forEach(function(q){q.els.forEach(function(e){if(!e.fo)zt=Math.max(zt,e.z)})})}
+function ensure(o){if(!o.fo)o.fo={on:1,pos:'c',st:1,sk:0,rh:''};if(!o.fo.fs){o.fo.fs=Object.assign({},FS0);o.fo.sk=0}
+ if(o.fo.on&&!hasFo(o))window.refoot();zfix()}
+var _ld=load;load=function(o,id){_ld(o,id);ensure(o)};
+var _sh=show;show=function(){_sh.apply(this,arguments);zfix()};
+var _c8=commit;commit=function(){applyFs();_c8()};
+var _pt8=paint;paint=function(e){_pt8(e);if(e.fo)N[e.id].style.zIndex=1e9};
+var _tpl=tpl;tpl=function(){_tpl.apply(this,arguments);if(S.fo&&S.fo.on)window.refoot()};
+var ps=document.createElement('details');ps.className='sec';ps.open=true;
+ps.innerHTML='<summary>Page number style</summary><label>Font<select id="pnf"></select></label><label>Size pt<input type="number" id="pns" step=".5" min="4"></label><label>Colour<input type="color" id="pnc"></label><label>Weight<select id="pnw"><option>300</option><option>400</option><option>500</option><option>600</option><option>700</option></select></label><div class="r"><button id="pnx">Number all pages</button></div><div style="opacity:.65">Also editable by selecting any number on the page; position and text stay linked to the Folios settings above.</div>';
+$('#tab_p').appendChild(ps);
+ps.addEventListener('change',function(){var F=S.fo,s=F.fs;s.font=$('#pnf').value;s.size=+$('#pns').value||8;s.color=$('#pnc').value;s.weight=+$('#pnw').value;applyFs();commit()});
+$('#pnx').onclick=function(){S.fo.on=1;window.refoot()};
+$('#rp').addEventListener('input',function(ev){var k=ev.target.dataset.k;if(sel&&sel.fo&&/^(font|size|color|weight)$/.test(k)){S.fo.fs[k]=sel[k];applyFs()}});
+var _pg8=pgs;pgs=function(){_pg8();var F=S.fo&&S.fo.fs;if(F){$('#pnf').innerHTML=FN.map(function(f){return'<option'+(f==F.font?' selected':'')+'>'+f+'</option>'}).join('');$('#pns').value=F.size;$('#pnc').value=F.color;$('#pnw').value=F.weight}var l=$('#pl');if(l)l.textContent=(S.i+1)+' / '+S.pages.length};
+
+/* ================= DESKTOP PINCH / CTRL-WHEEL ZOOM (canvas only) ================= */
+document.addEventListener('wheel',function(e){if(!e.ctrlKey)return;e.preventDefault();var t=e.target;if(!$('#cv').contains(t)||(pg.classList.contains('crop')&&art.contains(t)))return;
+ var r=sc.getBoundingClientRect(),cx=e.clientX-r.left,cy=e.clientY-r.top,o=z,u=(cx+sc.scrollLeft-60)/o,v=(cy+sc.scrollTop-60)/o;
+ zoom(o*Math.exp(-e.deltaY*(e.deltaMode?.05:.012)));sc.scrollLeft=60+u*z-cx;sc.scrollTop=60+v*z-cy},{passive:false});
+var g0=1;['gesturestart','gesturechange','gestureend'].forEach(function(n){document.addEventListener(n,function(e){e.preventDefault();if(matchMedia('(pointer:coarse)').matches||!$('#cv').contains(e.target))return;if(n=='gesturestart')g0=z;else if(n=='gesturechange')zoom(g0*e.scale)},{passive:false})});
+
+/* ================= MOBILE-FIRST SHELL ================= */
+['#top>b','#zo','#zi','#zl'].forEach(function(s){$(s).classList.add('dsk')});['#un','#nw'].forEach(function(s){$(s).closest('.g').classList.add('dsk')});
+var pn=document.createElement('span');pn.id='pn';pn.className='g';pn.innerHTML='<button id="pv">◀</button><span id="pl"></span><button id="pnn">▶</button>';
+$('#top').insertBefore(pn,$('#top .g'));
+$('#pv').onclick=function(){show(Math.max(0,S.i-1))};$('#pnn').onclick=function(){show(Math.min(S.pages.length-1,S.i+1))};
+tb.innerHTML=[['a','＋','Add'],['e','✎','Edit'],['p','▤','Pages'],['d','Aa','Style'],['j','⚙','Project']].map(function(x){return'<button data-n="'+x[0]+'"><i>'+x[1]+'</i>'+x[2]+'</button>'}).join('');
+function cur(){var s=A.dataset.s;return s=='r'?'e':s=='l'?($('#tbs .on')||{dataset:{}}).dataset.t:''}
+function mark(){var n=cur();[].forEach.call(tb.children,function(b){b.classList.toggle('on',!!n&&b.dataset.n==n)});document.body.classList.toggle('sh',!!A.dataset.s)}
+tb.onclick=function(e){var b=e.target.closest('button');if(!b)return;var n=b.dataset.n;if(cur()==n){A.dataset.s='';return}if(n=='e')A.dataset.s='r';else{var t=$('#tbs [data-t="'+n+'"]');if(t)t.click();A.dataset.s='l'}mark()};
+new MutationObserver(mark).observe(A,{attributes:true,attributeFilter:['data-s']});$('#tbs').addEventListener('click',mark);
+document.addEventListener('click',function(e){var a=e.target;if(innerWidth<=860&&(a.id=='lp'||a.id=='rp')&&e.clientY-a.getBoundingClientRect().top<30)A.dataset.s=''});
+var fl8=document.createElement('details');fl8.className='sec';fl8.open=true;
+fl8.innerHTML='<summary>File</summary><div class="r"><button data-p="nw">New</button><button data-p="js">Save / load JSON</button><button data-p="ex">Export image</button></div><label>Unit<select id="un2"><option>in</option><option>mm</option><option>pt</option></select></label>';
+$('#tab_j').insertBefore(fl8,$('#tab_j').firstChild);
+fl8.onclick=function(e){var p=e.target.dataset.p;if(p){A.dataset.s='';$('#'+p).click()}};
+$('#un2').onchange=function(){var u=$('#un');u.value=this.value;u.dispatchEvent(new Event('change',{bubbles:true}))};
+
+/* ================= MORE REFERENCE LAYOUTS ================= */
+var MS='Montserrat',CS='Libre Caslon Text',K='#111',L8='A few lines of copy describe the project, its setting and the ideas behind it, set small beside the images.',
+ph=function(x,y,w,h,g){return['photo',x,y,w,h,{g:g}]},
+c=function(x,y,w,t,p){return['cap',x,y,w,.3,Object.assign({font:MS,size:7,weight:500,color:K},p||{},{text:t})]},
+lab=function(a){return[c(4.9,9.95,2.95,a,{align:'right'}),c(8.9,9.95,4,'Project Title',{weight:700})]},
+kq=function(x,y,w,t,p){return['kick',x,y,w,.6,Object.assign({font:CS,size:6.5,ls:.04,upper:1,lh:1.35,color:'#1d1d1d',weight:400,text:t},p||{})]},
+bs=function(x,y,w,h,p){return['body',x,y,w,h,Object.assign({font:CS,size:6,lh:1.5,align:'left',drop:0,color:'#222',text:L8},p||{})]};
+var SP=[
+{n:'Portfolio · image pair',bg:'#f4f4f2',e:[ph(.55,.55,7.3,9.1,2),ph(8.9,.55,7.3,9.1,1)].concat(lab('sem. V 2025'))},
+{n:'Portfolio · plans + hero',bg:'#f4f4f2',e:[ph(.55,.55,3.55,1.9,0),ph(4.3,.55,3.55,1.9,0),c(.55,2.55,3.4,'Street-view elevation',{size:6,weight:400}),c(4.3,2.55,3.4,'Side elevation',{size:6,weight:400}),ph(.55,3.2,3.55,5.9,4),ph(4.3,3.2,3.55,5.9,4),c(.55,9.15,1.5,'Level 0',{size:6,weight:400}),c(4.3,9.35,1.5,'Level 1',{size:6,weight:400}),ph(8.9,.55,7.3,9.1,3)].concat(lab('competition 2025'))},
+{n:'Portfolio · title + axo + hero',bg:'#f4f4f2',e:[['head',.55,.45,7.6,1.5,{font:MS,weight:800,size:60,lh:.95,ls:-.05,color:K,text:'Project title'}],c(.55,2.25,3.3,'Semester VI, 2025',{size:7}),bs(.55,2.55,3.2,1.3,{font:MS,size:6.5,lh:1.25,color:K}),ph(.9,5,4.8,3.8,5),ph(8.375,-.125,8.5,9.9,3)].concat(lab('sem. VI 2025'))},
+{n:'Portfolio · four-up',bg:'#f4f4f2',e:[ph(.55,.55,7.3,4.4,1),ph(.55,5.05,7.3,4.4,2),ph(8.9,.55,7.3,4.4,3),ph(8.9,5.05,7.3,4.4,4)].concat(lab('sem. VI 2025'))},
+{n:'Portfolio · full-bleed drawing',bg:'#eee',e:[ph(-.125,-.125,17,11.125,5),c(.55,9.95,3,'Project Title',{weight:700}),c(12,9.95,4.2,'sem. VI 2025',{align:'right'})]}];
+var PGS=[
+{n:'Portfolio cover',bg:'#f4f4f2',e:[['head',.5,.4,5.6,1.5,{font:MS,weight:800,size:70,lh:.9,ls:-.05,color:K,text:'Portfolio'}],c(6.1,.55,1.75,'Name\nSurname\nArchitecture\n2025',{size:9,align:'right',lh:1.25}),ph(.5,2,7.35,8.2,4)]},
+{n:'Site · project page',bg:'#fbfbf9',e:[['head',.6,.5,2,.55,{font:CS,size:11,lh:1,upper:1,weight:400,ls:0,color:'#1d1d1d',text:'Brand\nName'}],kq(3.6,.6,4.15,'ARCHITECTURE & DESIGN    STUDIO    PRESS    CONTACT',{align:'right',size:5.5}),ph(.6,1.5,7.15,3.6,0),kq(.6,3.15,7.15,'PROJECT NAME',{align:'center',color:'#fff',size:8}),kq(.6,5.3,2.2,'CITY, ST\n4,900 SQ FT\n2018',{size:5.5}),kq(3.3,5.3,4.4,'PROJECT TEAM: FIRM NAME\nPHOTOGRAPHY: NAME',{size:5.5}),bs(.6,6.6,3.2,1.6),ph(4.3,6.2,3.45,4,4),ph(.6,8.4,2.6,1.4,2)]},
+{n:'Site · project card',bg:'#cfccc4',e:[['box',2,1.3,4.4,8.2,{fill:'#fff'}],ph(2,1.3,4.4,5.4,1),['head',2,3.7,4.4,.5,{font:CS,size:16,upper:1,weight:400,ls:.06,lh:1,align:'center',color:'#fff',text:'Project name'}],kq(2.3,7.1,3.8,'PROJECT NAME, NY\n1,800 SQFT\n2019',{size:7}),kq(2.3,8.2,3.8,'PROJECT TEAM: FIRM NAME\nPHOTOGRAPHY: NAME\nSTYLING: NAME',{size:6})]},
+{n:'Brand · team page',bg:'#c9c6be',e:[bs(.6,.7,3.4,1.6),bs(4.35,.7,3.4,1.6),kq(.6,9.9,3,'INFO@BRAND.COM\n+1 000 000 0000',{size:5.5})].concat([.6,3.03,5.45].reduce(function(a,x,i){return a.concat([ph(x,3,2.3,3.9,i+1),kq(x,7.05,2.3,'FULL NAME',{size:6.5,weight:700}),kq(x,7.3,2.3,'ROLE',{size:5.5}),bs(x,7.65,2.3,2.1,{size:5.8})])},[]))},
+{n:'Brand · logo plate',bg:'#e9e6dc',e:[['head',.6,4.6,7.15,1.2,{font:CS,size:34,upper:1,weight:400,lh:1.05,ls:.02,align:'center',color:'#1d1d1b',text:'Brand\nName'}]]}];
+var sec=document.createElement('details');sec.className='sec';sec.open=true;sec.innerHTML='<summary>More references</summary><div id="lg8"></div><div style="opacity:.65;margin-top:6px">Portfolio spreads (grotesque, square-book) and Garrison-style site / brand pages.</div>';
+var g=sec.querySelector('#lg8');
+SP.forEach(function(t){var b=document.createElement('button');b.textContent=t.n;b.onclick=function(){window.tplS(t)};g.appendChild(b)});
+PGS.forEach(function(t){var k=TP.push(t)-1,b=document.createElement('button');b.textContent=t.n;b.onclick=function(){tpl(k)};g.appendChild(b)});
+$('#tab_a').appendChild(sec);
+
+/* apply to whatever is already loaded */
+ensure(S);applyFs();pgs();mark();
+})();
+
+/* ---- v9: Mpape brochure copy + ministry letter ---- */
+(function(){
+var $=function(s){return document.querySelector(s)},LT='#f3efe3',
+ph=function(x,y,w,h,g){return['photo',x,y,w,h,{g:g}]},
+kx=function(x,y,w,t,p){return['kick',x,y,w,.3,Object.assign({text:t},p||{})]},
+hd=function(x,y,w,h,t,s,p){return['head',x,y,w,h,Object.assign({text:t,size:s},p||{})]},
+dk=function(x,y,w,h,t,s,p){return['deck',x,y,w,h,Object.assign({text:t,size:s||17},p||{})]},
+bd=function(x,y,w,h,t,p){return['body',x,y,w,h,Object.assign({text:t,drop:0,size:9.5,align:'left'},p||{})]},
+nu=function(x,y,w,h,t,p){return['num',x,y,w,h,Object.assign({text:t,size:11},p||{})]},
+bu=function(x,y,w,h,t,p){return['bul',x,y,w,h,Object.assign({text:t},p||{})]},
+set=function(n,e){TP.forEach(function(t){if(t.n==n)t.e=e})};
+set('Cover',[ph(-.125,-.125,8.625,11.125,0),kx(.6,.6,6,'Hill Side Eco-Tourist Village',{color:LT}),hd(.5,.95,7.6,3.1,'MPAPE\nHILLS',130,{lh:.88,color:LT}),
+dk(.6,4.4,4.6,1.7,'A complete destination on one hillside — events, accommodation, residential living, leisure and community enterprise, minutes from Abuja.',16,{color:LT}),
+bd(.6,8.6,3.5,1.6,'THE GLASS PAVILION\nEvents in the clouds\n\nARO HOUSING\nThe Diaspora Village',{color:LT,size:11}),
+bd(4.3,8.6,3.5,1.6,'THE BEACH CLUB\nThe ultimate weekend escape\n\n20 ECO-CABINS\nInfinity pools over the valley',{color:LT,size:11})]);
+set('Intro',[kx(.6,.6,4,'Sustainability'),hd(.6,.9,4.6,2,'Elevated\nSustainability',48),
+bd(.6,2.9,3.4,4.4,'At the Hillside Eco-Tourist Village, we are pioneers of sustainable hospitality. By harnessing renewable energy and implementing eco-friendly practices, we are dedicated to reducing emissions and nurturing a greener economy — proving that world-class hospitality can tread lightly on the land it calls home.\n\nSustainability here is operational, not ornamental. Solar arrays power the village, water is harvested and recycled, cabins are built from repurposed shipping containers, and the organic farm supplies the kitchen — closing the loop between land and table.',{size:9,drop:1}),
+ph(4.4,.6,3.4,6.7,1),nu(.6,7.6,7.15,2.5,'Renewable Energy — Clean power, harnessed from the elements.\nEco-Friendly Practices — Sustainability woven into every detail.\nA Greener Economy — Nurturing land, community and commerce.')]);
+set('Eight experiences',[kx(.6,.6,4,'The ecosystem'),hd(.6,.9,7,1.9,'Eight Signature\nExperiences',54),dk(.6,2.75,7,.5,'A harmonious fusion designed to captivate',15),
+bd(.6,3.3,7.15,1,'Each experience strengthens the others. The farm supplies the restaurant, the restaurant trains the school\u2019s students, the cabins host the wedding guests, and the weddings introduce those guests to everything else — one hillside, one integrated operation.',{size:9.5}),
+ph(.6,4.4,7.15,1.8,2),nu(.6,6.4,7.15,3.9,'Hillside Accommodation — Luxurious container cabins with private infinity pools overlooking the valley.\nBeach Club — An exclusive weekend getaway with artificial beach and infinity pool.\nSpa & Wellness — World-class holistic treatments and mountain-air retreats.\nOrganic Farm — Sustainable agriculture providing fresh produce for the restaurant and community.\nWedding Venue — A breathtaking hillside location for weddings and unforgettable events.\nThe Hub — Supporting small-scale creatives with equipment in exchange for sweat equity.\nArt Gallery — Showcasing local artisans and providing a platform for cultural immersion.\nFarm-to-Table Restaurant — A world-class dining experience using fresh ingredients from our own farm.',{cols:2,size:8.5,cg:.3})]);
+set('Feature',[ph(-.125,-.125,8.625,4.4,2),kx(.6,4.5,3,'Feature'),hd(.6,4.75,7.1,1,'The Glass Pavilion',46),
+bd(.6,5.85,7.15,3.2,'Our signature event space features a transparent architectural design that immerses guests in the surrounding landscape while providing climate-controlled luxury. Guests celebrate inside the view — the hillside is the décor.\n\nThe Pavilion also anchors our destination-wedding strategy. Africa\u2019s wedding market is in transition: South Africa, the long-standing default, has lost bookings as xenophobic incidents and travel advisories unsettle couples and planners, with Rwanda, Morocco and Zanzibar absorbing the demand. No purpose-built venue has yet claimed the Nigerian celebration at scale — despite the continent\u2019s largest wedding culture and a diaspora that currently spends its wedding budgets abroad. With capacity for 300+ guests, on-site accommodation, catering and leisure for the full wedding weekend, the Pavilion brings that spend home. And because weddings book 9–14 months in advance, they generate revenue before the resort fully opens.',{cols:2,size:8.6,cg:.3,drop:1,align:'justify'}),
+bu(.6,9.05,7.15,1.3,'Panoramic hillside views\nCapacity for 300+ guests\nIntegrated landscaping\nSunset ceremonies\nDestination wedding packages',{cols:3,size:8,cg:.25})]);
+set('Village',[kx(.6,.6,4,'Aro Housing'),hd(.6,.9,7.1,1.2,'The Diaspora Village',52),
+dk(.6,2.15,7.1,1.2,'A premium residential development of 2 & 3-bedroom luxury apartments, designed for the diaspora and expatriates seeking a serene live-work environment — with full resort access.',15),
+ph(.6,3.5,7.15,3.5,4),bd(.6,7.2,7.15,1,'For the diaspora, a lock-and-leave home ready for every visit; for expatriates, a live-work base with resort privileges. The Village also houses wedding parties and long-stay guests, feeding revenue into the wider resort.'),
+bd(.6,8.5,1.65,1.6,'CLUB HOUSE\nExclusive community hub',{size:9}),bd(2.45,8.5,1.65,1.6,'CO-WORKING SPACES\nHigh-speed fibre ready',{size:9}),bd(4.3,8.5,1.65,1.6,'SUSTAINABILITY\nSolar-powered smart homes',{size:9}),bd(6.15,8.5,1.6,1.6,'RESORT ACCESS\nFull VIP privileges',{size:9})]);
+set('Beach club',[kx(.6,.6,4,'Urban oasis'),hd(.6,.9,7,1.9,'The Hillside\nBeach Club',54),
+dk(.6,3,3.4,1.9,'A premier destination for weekend getaways, bringing the coastal experience to the hills. Featuring an artificial sand beach, expansive infinity pool and VIP service.',14),
+bu(4.3,3.05,3.45,1.8,'Artificial sand beach\nVIP cabanas & lounges\nPoolside bar & grill\nWeekend DJ sets & events'),
+bd(.6,5,7.15,.8,'The Club keeps the hillside busy between events — drawing Abuja\u2019s weekend crowd through day passes, cabana rentals and poolside dining, and giving wedding parties a place to gather the day after.'),ph(-.125,5.95,8.625,5.05,3)]);
+set('Community',[ph(-.125,-.125,2.2,11.125,4),kx(2.7,.6,4,'Community'),hd(2.7,.9,5.1,2.4,'Empowering the Community',40),
+dk(2.7,3.4,5.05,1.7,'The Hub agrees to fund or facilitate green-lit projects — protecting its investments and ensuring the growth of the local ecosystem.',16),
+bd(2.7,5.2,5.05,1.5,'The Hub is the village\u2019s engine for local value: creatives receive equipment and training in exchange for sweat equity, viable projects receive funding, and hiring, training and procurement prioritize the Mpape community.',{size:9.5}),
+nu(2.7,6.9,5.05,3,'Train — Trained as C.S.R. representatives for the community.\nGive Back — Sharing data & funding local projects.\nSign Up — All participants & hub members must sign up.')]);
+set('Revenue',[kx(.6,.6,4,'The business'),hd(.6,.9,7,1.1,'Revenue Streams',54),dk(.6,2.1,5,.9,'Our diversified model ensures resilience against market fluctuations while fostering community trust.',15),
+nu(.6,3.3,7.15,3.6,'Accommodation — Premium suites and luxury container cabins.\nCulinary School — Tuition, memberships and restaurant sales.\nBeach Club — Day passes, cabana rentals and F&B sales.\nEvents — Corporate retreats, team bonding, hillside weddings and destination wedding packages.\nArt & Commissions — Sale of artwork and exhibition fees.\nPartnerships — Collaborative ventures with local vendors.',{cols:2,size:10}),ph(-.125,7.1,8.625,4,3)]);
+set('Phases',[kx(.6,.6,4,'The roadmap'),hd(.6,.9,7,1.1,'Phases of Development',48),dk(.6,2.05,5,.5,'A strategic rollout for sustainable growth.',15),
+bd(.6,2.7,6,.9,'Opening the event centre first means the property earns revenue — and builds its reputation through weddings — while later phases are still under construction.'),
+nu(.6,3.9,7.15,6.2,'Cash Flow Engine — Event Center & Wedding Venue: immediate revenue generation.\nThe Foundation — Eco Farm & Restaurant: brand establishment.\nExpansion — 20 luxury eco-cabins: accommodation for event guests.\nThe Institution — 40-room hotel · Culinary & Hospitality School · City View Suites.\nFull Ecosystem — Creative Hub · Art Gallery · Wellness Spa.\nAro Housing — Luxury apartments: real estate sales.',{size:11.5})]);
+set('Budget',[kx(.6,.6,4,'The numbers'),hd(.6,.9,7,1.1,'Budget Execution',54),
+dk(.6,2.1,6.6,1.9,'Two-thirds of capital is committed to eco-construction and core infrastructure — building the experience before marketing it. Ninety percent of the budget becomes physical asset: buildings, energy systems and a school, with marketing held to the final ten.',14),
+['stat',.6,4.4,3,1.4,{text:'65%',size:110}],['cap',.6,5.9,3,.5,{text:'Eco-construction and core infrastructure'}],
+nu(3.9,4.4,3.85,4.5,'Eco-Construction — 35%\nInfrastructure — 30%\nCulinary School — 15%\nEnergy — 10%\nMarketing — 10%',{size:12})]);
+set('Why us',[hd(.6,.6,4,1,'Why Us?',56),ph(-.125,1.9,8.625,3.6,4),
+nu(.6,5.8,7.15,4.5,'Positioned for a Market in Transition — Purpose-built for destination weddings at the moment Africa\u2019s default venue is in question.\nEco-Friendly Beacon — A commitment to environmental stewardship.\nDiverse Experiences — From rock climbing to fine dining in the clouds.\nSustainable Construction — Infrastructure designed using eco-friendly materials.\nIntimate & Immersive — A departure from traditional opulent hotels.',{size:10.5})]);
+set('Back cover',[ph(-.125,-.125,8.625,11.125,5),hd(.6,2.9,7.2,1.5,'Ready to Elevate?',60,{align:'center',color:LT}),
+bd(1.2,4.7,6,2.6,'For investors: diversified revenue, with wedding bookings secured up to a year ahead of opening. For the Ministry and development partners: jobs, foreign exchange and a flagship for tourism diversification. For couples, planners and guests: a hillside that does it all.',{color:LT,size:12,align:'center',lh:1.6}),
+kx(.6,7.7,7.15,'Inquiries · Partnerships · Site visits',{align:'center',color:LT})]);
+/* extra pages */
+var IMP={n:'Tourism impact',e:[kx(.6,.6,4,'Optional sidebar'),hd(.6,.9,7,1.1,'Tourism Impact',54),['stat',.6,2.3,2.6,1.3,{text:'[X]',size:96}],
+dk(3.4,2.5,4.35,1.3,'direct jobs at full operation, with roughly two indirect jobs created per direct hospitality role',15),
+nu(.6,4.2,7.15,5.6,'Priority hiring and procurement from Mpape and surrounding communities\nInbound foreign exchange from destination weddings, events and diaspora travel — spend currently exported to Dubai, Cape Town and Accra\nA flagship leisure destination for the FCT, supporting the Ministry of Tourism\u2019s diversification agenda\nYear-round demand across wedding season, corporate retreats, weekend leisure and December diaspora travel',{size:11})]};
+var ik=TP.push(IMP)-1;
+var F='Jost',cp=function(x,y,w,h,t,p){return['body',x,y,w,h,Object.assign({text:t,font:F,size:9.5,lh:1.5,align:'left',drop:0,color:'#2b2b2b'},p||{})]};
+var hdr=[['head',.6,.6,7.15,.5,{text:'[Your Company/Joint Venture Name or Letterhead]',font:F,weight:500,size:14,ls:.08,align:'center',color:'#2b2b2b',lh:1.2}],
+['cap',.6,1.15,7.15,.3,{text:'[Your Address in Lagos/Abuja]  ·  [Your Phone Number]  ·  [Your Email Address]',align:'center',size:8,color:'#555'}],['rule',.6,1.6,7.15,.01,{}]];
+var L1={n:'Ministry letter · page 1',c:'Letterhead',bg:'#fbfaf6',e:hdr.concat([
+cp(.6,1.9,4,.3,'September 19, 2026'),
+cp(.6,2.35,7.15,1.8,'The Honorable Minister,\nHannatu Musa Musawa,\nFederal Ministry of Art, Culture, Tourism and the Creative Economy (FMACTCE),\nFederal Secretariat Complex,\nAbuja, FCT, Nigeria.\n\nAttention: Office of the Honorable Minister / Department of Tourism Development'),
+cp(.6,4.35,7.15,.7,'SUBJECT: REQUEST FOR STRATEGIC ENDORSEMENT AND PPP PARTNERSHIP FOR THE MPAPE HILLSIDE ECO-VILLAGE & CREATIVE HUB',{weight:600}),
+cp(.6,5.15,7.15,4.9,'Honorable Minister,\n\nI am writing on behalf of our joint venture to formally introduce the Mpape Hillside Eco-Village & Creative Hub—a pioneering, zero-emission eco-tourism destination and creative capacity-building development located in the Federal Capital Territory.\n\nWe commend the Ministry\u2019s visionary leadership, particularly regarding the "Destination 2030" and "Motherland 2025" mandates. The Mpape Hillside project has been meticulously designed to anchor these initiatives by transforming Abuja\u2019s natural topography into a globally competitive tourist attraction. Please find attached our executive summary, which outlines the sustainable architectural footprint utilizing upcycled container infrastructure and a decentralized solar power grid.\n\nCrucially, this development bridges the gap between premium hospitality and the creative economy. The destination houses a dedicated Hospitality and Culinary School that will operate on a structured academic calendar with annual graduating classes. Through an innovative incubator model, we are providing small-scale creatives, chefs, and artisans with high-end equipment, professional support, and a network. In return, these creatives contribute "sweat equity" to the ecosystem and act as active brand ambassadors, driving grassroots visibility for the hub.')])};
+var L2={n:'Ministry letter · page 2',c:'Letterhead',bg:'#fbfaf6',e:[
+['cap',.6,.6,7.15,.3,{text:'Mpape Hillside Eco-Village & Creative Hub · Request for Strategic Endorsement and PPP Partnership',size:7.5,color:'#777'}],['rule',.6,1,7.15,.01,{}],
+cp(.6,1.4,7.15,5.6,'To fully actualize this project as a National Tourist Site, we respectfully seek the institutional endorsement of FMACTCE. As the project is situated on land secured under an AMAC rural council allocation, we also request the Ministry\u2019s strategic facilitation in liaising with the FCT Administration (FCTA) and Abuja Geographic Information Systems (AGIS). Your inter-agency backing will be instrumental in expediting the regularisation of the title into a Statutory Right of Occupancy, thereby cementing the legal foundation required for a robust Public-Private Partnership (PPP).\n\nWe would be deeply honored to secure a brief audience with you or your designated directors to present our pictorial blueprints and discuss how the Mpape Hillside Eco-Village can serve as a flagship asset for the Ministry\'s tourism agenda.\n\nThank you for your time, visionary leadership, and dedication to advancing Nigeria\'s creative and tourism economies.\n\nYours faithfully,'),
+cp(.6,6.3,4,1.5,'\n\nEIO\nProject Lead\nAbuja Creative Eco Village',{weight:500})]};
+var l1=TP.push(L1)-1,l2=TP.push(L2)-1;
+/* UI */
+var sec=document.createElement('details');sec.className='sec';sec.open=true;
+sec.innerHTML='<summary>Mpape content</summary><div class="r"><button id="mb">Build full brochure (13 pages)</button><button id="ml">Add ministry letter (2 pages)</button><button id="mi">Add impact page</button></div><div style="opacity:.65">Brochure pages are also in Layouts under Brochure; the letter is in the letterhead style with editable placeholders.</div>';
+$('#tab_a').insertBefore(sec,$('#tab_a').firstChild);
+sec.onclick=function(e){var i=e.target.id;if(i=='mb'){if(!confirm('Replace the current project with the Mpape brochure?'))return;
+ var u=S.u;S=S0();S.u=u;load(S);['Cover','Intro','Eight experiences','Feature','Village','Beach club','Community','Tourism impact','Revenue','Phases','Budget','Why us','Back cover'].forEach(function(n){var k=-1;TP.forEach(function(t,j){if(t.n==n)k=j});tpl(k)});sync();S.pages.shift();show(0,1);window.refoot();fit()}
+ else if(i=='ml'){tpl(l1);tpl(l2)}else if(i=='mi')tpl(ik)}
+})();
 </script>
 </body>
 </html>
