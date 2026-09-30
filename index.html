@@ -85,11 +85,11 @@ dialog label{display:block;margin:6px 0}
 <body>
 <div id="app">
 <header id="top"><b>Layout Studio</b>
-<button id="un_">Undo</button><button id="re_">Redo</button>
-<span><button id="zo">−</button> <span id="zl">100%</span> <button id="zi">+</button> <button id="zf">Fit</button></span>
-<label>Unit <select id="un"><option>in</option><option>mm</option><option>pt</option></select></label>
-<label><input type="checkbox" data-v="bd" checked>Bleed</label><label><input type="checkbox" data-v="mg" checked>Margins</label><label><input type="checkbox" data-v="co" checked>Columns</label><label><input type="checkbox" data-v="bl">Baseline</label><label><input type="checkbox" data-v="gd" checked>Guides</label><label><input type="checkbox" data-v="sn" checked>Snap</label>
-<button id="nw">New</button><button id="js">Save / load JSON</button><button id="ex">Export image</button><button id="pr">Print / PDF</button></header>
+<span class="g"><button id="un_">Undo</button><button id="re_">Redo</button></span>
+<span class="g"><button id="zo">−</button> <span id="zl">100%</span> <button id="zi">+</button> <button id="zf">Fit</button></span>
+<span class="g"><label>Unit <select id="un"><option>in</option><option>mm</option><option>pt</option></select></label></span>
+<details id="vd" class="g"><summary>Show</summary><div class="pop"><label><input type="checkbox" data-v="bd" checked>Bleed</label><label><input type="checkbox" data-v="mg" checked>Margins</label><label><input type="checkbox" data-v="co" checked>Columns</label><label><input type="checkbox" data-v="bl">Baseline</label><label><input type="checkbox" data-v="gd" checked>Guides</label><label><input type="checkbox" data-v="sn" checked>Snap</label></div></details>
+<span class="g"><button id="nw">New</button><button id="js">Save / load JSON</button><button id="ex">Export image</button><button id="pr">Print / PDF</button></span></header>
 <aside id="lp"><h3>Pages</h3><div id="pb"></div><h3>Elements · click or drag</h3><div id="pal"></div><h3>Templates · adds a page</h3><div id="tp"></div><h3>Layers</h3><div id="ly"></div></aside>
 <div id="cv"><div class="cn"></div><canvas id="rt"></canvas><canvas id="rl"></canvas>
 <div id="sc"><div id="sz"><div id="pg"><div id="art"></div><div id="ov"></div><div id="gd"></div></div></div></div></div>
@@ -120,7 +120,7 @@ num:{n:'Numbered list',w:3,h:2,text:'First item\nSecond item\nThird item',size:1
 photo:{n:'Photo',w:3.5,h:3.5},
 box:{n:'Color block',w:2,h:2,fill:'#7a4a32'},
 rule:{n:'Rule',w:4,h:.02,fill:'#3b3628'}};
-var DF={font:'Jost',size:10,weight:400,lh:1.4,ls:0,color:'#3b3628',align:'left',cols:1,ac:'#7a4a32',op:100,fill:'',bw:0,bc:'#3b3628',rad:0,text:'',italic:0,upper:0,drop:0,src:0,fit:'cover'};
+var DF={font:'Jost',size:10,weight:400,lh:1.4,ls:0,color:'#3b3628',align:'left',cols:1,cg:.25,cf:'balance',cr:0,ac:'#7a4a32',op:100,fill:'',bw:0,bc:'#3b3628',rad:0,text:'',italic:0,upper:0,drop:0,src:0,fit:'cover'};
 var pg=$('#pg'),art=$('#art'),ov=$('#ov'),gdl=$('#gd'),sc=$('#sc'),sz=$('#sz'),rp=$('#rp'),rt=$('#rt'),rl=$('#rl');
 function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return'&#'+c.charCodeAt(0)+';'})}
 function E(id){return S.els.filter(function(x){return x.id==id})[0]}
@@ -131,7 +131,7 @@ function mk(e){var n=document.createElement('div');n.className='el';n.id='e'+e.i
 function paint(e){var n=N[e.id],i=n.firstChild,s=n.style,k=PX,L=e.text.split('\n'),h;
 s.left=e.x*k+'px';s.top=e.y*k+'px';s.width=e.w*k+'px';s.height=e.h*k+'px';s.zIndex=e.z;
 i.className='in '+e.t+(e.drop&&e.t=='body'?' dc':'');
-i.style.cssText="font-family:'"+e.font+"',Georgia,serif;font-size:"+e.size+'pt;font-weight:'+e.weight+';font-style:'+(e.italic?'italic':'normal')+';line-height:'+e.lh+';letter-spacing:'+e.ls+'em;color:'+e.color+';text-align:'+e.align+';text-transform:'+(e.upper?'uppercase':'none')+';column-count:'+e.cols+';column-gap:.25in;opacity:'+e.op/100+';border:'+e.bw+'px solid '+e.bc+';border-radius:'+e.rad+'px;--a:'+e.ac+';background:'+(e.t=='photo'&&!IM[e.src]?GR[e.g]:e.fill||'none');
+i.style.cssText="font-family:'"+e.font+"',Georgia,serif;font-size:"+e.size+'pt;font-weight:'+e.weight+';font-style:'+(e.italic?'italic':'normal')+';line-height:'+e.lh+';letter-spacing:'+e.ls+'em;color:'+e.color+';text-align:'+e.align+';text-transform:'+(e.upper?'uppercase':'none')+';column-count:'+(e.cols||1)+';column-gap:'+(e.cg==null?.25:e.cg)+'in;column-fill:'+(e.cf=='auto'?'auto':'balance')+';column-rule:'+(e.cr?'1px solid rgba(0,0,0,.28)':'none')+';opacity:'+e.op/100+';border:'+e.bw+'px solid '+e.bc+';border-radius:'+e.rad+'px;--a:'+e.ac+';background:'+(e.t=='photo'&&!IM[e.src]?GR[e.g]:e.fill||'none');
 if(e.t=='photo')h=IM[e.src]?'<img src="'+IM[e.src]+'" style="object-fit:'+e.fit+'">':'<b>Photo · drop or upload</b>';
 else if(e.t=='bul'||e.t=='num')h='<ol>'+L.map(function(x){return'<li>'+esc(x)+'</li>'}).join('')+'</ol>';
 else h=TX.indexOf(e.t)>-1?esc(e.text):'';
@@ -165,7 +165,7 @@ while(mi*pp<7)mi*=2;
 for(var i=Math.floor(-o/pp/mi);i*mi*pp+o<L;i++){var v=i*mi,q=v*pp+o,q1=v/U.ma,mj=Math.abs(q1-Math.round(q1))<1e-6,l=mj?12:(Math.abs(q1*2-Math.round(q1*2))<1e-6?9:5);
 x.beginPath();if(h){x.moveTo(q+.5,20);x.lineTo(q+.5,20-l)}else{x.moveTo(20,q+.5);x.lineTo(20-l,q+.5)}x.stroke();
 if(mj){var s=''+(+v.toFixed(2));if(h)x.fillText(s,q+3,10);else{x.save();x.translate(1,q+3);x.rotate(Math.PI/2);x.fillText(s,0,0);x.restore()}}}})}
-/* ---- inspector ---- */
+/* ---- inspector (grouped into collapsible sections) ---- */
 function fl(k,l,o,src){o=o||{};var v=(src||sel)[k],c;
 if(o.t=='s')c='<select data-k="'+k+'">'+o.o.map(function(x){return'<option'+(x==v?' selected':'')+'>'+x+'</option>'}).join('')+'</select>';
 else if(o.t=='c')c='<input type="color" data-k="'+k+'" value="'+(v||'#000000')+'">';
@@ -173,26 +173,36 @@ else if(o.t=='k')c='<input type="checkbox" data-k="'+k+'"'+(v?' checked':'')+'>'
 else if(o.t=='a')c='<textarea data-k="'+k+'" rows="4">'+esc(v)+'</textarea>';
 else c='<input type="number" data-k="'+k+'" step="'+(o.s||'any')+'"'+(o.u?' data-u="1"':'')+' value="'+(o.u?cv(v):v)+'">';
 return'<label>'+l+c+'</label>'}
+var OP={};
+function sec(id,t,b,o){var op=OP[id]==null?o:OP[id];return'<details class="sec" data-o="'+id+'"'+(op?' open':'')+'><summary>'+t+'</summary>'+b+'</details>'}
 function insp(){var e=sel,h;
-if(!e)h='<h3>Page</h3><label>Preset<select data-k="pr"><option value="">Custom</option><option value="mag">Magazine 8.375×10.875</option><option value="a4">A4</option><option value="a5">A5</option><option value="let">US Letter</option><option value="tab">Tabloid 11×17</option><option value="sq">Square 9×9</option><option value="spr">Magazine spread 16.75×10.875</option></select></label><div class="r"><button data-a="por">Portrait</button><button data-a="lan">Landscape</button></div>'+fl('W','Width',{u:1},S)+fl('H','Height',{u:1},S)+fl('b','Bleed',{u:1},S)+fl('m','Margin',{u:1},S)+fl('cols','Columns',{s:1},S)+fl('g','Gutter',{u:1},S)+fl('bl','Baseline pt',{},S)+fl('bg','Page color',{t:'c'},S)+FU+'<p style="opacity:.65">Drag from a ruler to pull out a guide; drag it back onto the ruler to remove it. Select an element to edit it.</p>';
-else{h='<h3>'+D[e.t].n+'</h3><div class="r"><button data-a="fr">Front</button><button data-a="bk">Back</button><button data-a="fit">Fit margins</button><button data-a="dup">Duplicate</button><button data-a="del">Delete</button></div>'+fl('x','X',{u:1})+fl('y','Y',{u:1})+fl('w','Width',{u:1})+fl('h','Height',{u:1});
-if(TX.indexOf(e.t)>-1)h+=fl('text','Text',{t:'a'})+fl('font','Font',{t:'s',o:FN})+FU+fl('size','Size pt',{s:.5})+fl('weight','Weight',{t:'s',o:[300,400,500,600,700]})+fl('lh','Leading',{s:.05})+fl('ls','Tracking em',{s:.01})+fl('align','Align',{t:'s',o:['left','center','right','justify']})+fl('color','Text color',{t:'c'})+fl('ac','Accent',{t:'c'})+fl('italic','Italic',{t:'k'})+fl('upper','Uppercase',{t:'k'});
-if(e.t=='body')h+=fl('cols','Columns',{s:1})+fl('drop','Drop cap',{t:'k'});
-if(e.t=='photo')h+='<label>Image<input type="file" accept="image/*"></label>'+fl('fit','Fit',{t:'s',o:['cover','contain']})+fl('g','Placeholder',{t:'s',o:[0,1,2,3,4,5]});
-else h+=fl('fill','Fill',{t:'c'})+'<button data-a="nf">No fill</button>';
-h+=fl('bw','Border px',{s:.5})+fl('bc','Border color',{t:'c'})+fl('rad','Radius px',{})+fl('op','Opacity %',{s:1})}
+if(!e)h='<h3>Page</h3>'+sec('pgz','Size &amp; orientation','<label>Preset<select data-k="pr"><option value="">Custom</option><option value="mag">Magazine 8.375×10.875</option><option value="a4">A4</option><option value="a5">A5</option><option value="let">US Letter</option><option value="tab">Tabloid 11×17</option><option value="sq">Square 9×9</option><option value="spr">Magazine spread 16.75×10.875</option></select></label><div class="r"><button data-a="por">Portrait</button><button data-a="lan">Landscape</button></div>'+fl('W','Width',{u:1},S)+fl('H','Height',{u:1},S),1)+sec('pgg','Margins &amp; grid',fl('b','Bleed',{u:1},S)+fl('m','Margin',{u:1},S)+fl('cols','Columns',{s:1},S)+fl('g','Gutter',{u:1},S)+fl('bl','Baseline pt',{},S),1)+sec('pgc','Colour &amp; fonts',fl('bg','Page color',{t:'c'},S)+FU,0)+'<p style="opacity:.65">Drag from a ruler to pull out a guide; drag it back onto the ruler to remove it. Select an element to edit it.</p>';
+else{var T=TX.indexOf(e.t)>-1,ph=e.t=='photo';
+if(T){if(e.cg==null)e.cg=.25;if(!e.cf)e.cf='balance';if(e.cols==null)e.cols=1}
+h='<h3>'+D[e.t].n+'</h3><div class="r"><button data-a="fr">Front</button><button data-a="bk">Back</button><button data-a="fit">Fit margins</button><button data-a="dup">Duplicate</button><button data-a="del">Delete</button></div>';
+h+=sec('pos','Position &amp; size',fl('x','X',{u:1})+fl('y','Y',{u:1})+fl('w','Width',{u:1})+fl('h','Height',{u:1}),1);
+if(T){
+h+=sec('txt','Text',fl('text','Text',{t:'a'})+fl('font','Font',{t:'s',o:FN})+FU+fl('size','Size pt',{s:.5})+fl('weight','Weight',{t:'s',o:[300,400,500,600,700,800]})+fl('lh','Leading',{s:.05})+fl('ls','Tracking em',{s:.01})+fl('align','Align',{t:'s',o:['left','center','right','justify']})+fl('italic','Italic',{t:'k'})+fl('upper','Uppercase',{t:'k'})+(e.t=='body'?fl('drop','Drop cap',{t:'k'}):''),1);
+h+=sec('col','Columns','<div class="r" style="align-items:center"><span style="opacity:.7">Split into</span>'+[1,2,3,4].map(function(n){return'<button data-a="c'+n+'"'+((e.cols||1)==n?' class="on"':'')+'>'+n+'</button>'}).join('')+'</div><label>Count<input type="number" data-k="cols" min="1" max="8" step="1" value="'+(e.cols||1)+'"></label>'+fl('cg','Gap',{u:1})+'<label>Flow<select data-k="cf"><option value="balance"'+(e.cf=='balance'?' selected':'')+'>Balanced</option><option value="auto"'+(e.cf=='auto'?' selected':'')+'>Fill column 1 first</option></select></label>'+fl('cr','Rule between',{t:'k'})+'<div class="r"><button data-a="gr">Match page columns</button></div><div style="opacity:.65">Works on every text element. “Match page columns” stretches the box to the margins and uses the page grid’s column count and gutter.</div>',1);
+h+=sec('clr','Colour',fl('color','Text color',{t:'c'})+fl('ac','Accent',{t:'c'}),0)}
+if(ph)h+=sec('img','Image','<label>Image<input type="file" accept="image/*"></label>'+fl('fit','Fit',{t:'s',o:['cover','contain']})+fl('g','Placeholder',{t:'s',o:[0,1,2,3,4,5]}),1);
+h+=sec('fil',ph?'Border &amp; opacity':'Fill &amp; border',(ph?'':fl('fill','Fill',{t:'c'})+'<div class="r"><button data-a="nf">No fill</button></div>')+fl('bw','Border px',{s:.5})+fl('bc','Border color',{t:'c'})+fl('rad','Radius px',{})+fl('op','Opacity %',{s:1}),0)}
 rp.innerHTML=h}
+rp.addEventListener('toggle',function(ev){var d=ev.target;if(d.dataset&&d.dataset.o)OP[d.dataset.o]=d.open},true);
 function pos(){if(!sel)return;['x','y','w','h'].forEach(function(k){var i=rp.querySelector('[data-k="'+k+'"]');if(i)i.value=cv(sel[k])})}
 function layers(){$('#ly').innerHTML=S.els.slice().sort(function(a,b){return b.z-a.z}).map(function(e){return'<div class="ly'+(sel==e?' on':'')+'" data-id="'+e.id+'">'+D[e.t].n+(TX.indexOf(e.t)>-1?' · '+esc(e.text.slice(0,14)):'')+'</div>'}).join('')}
 rp.addEventListener('input',function(ev){var t=ev.target,k=t.dataset.k;if(!k)return;var v=t.type=='checkbox'?+t.checked:t.type=='number'?parseFloat(t.value):t.value,o=sel||S;
 if(k=='pr'){if(PR[v]){S.W=PR[v][0];S.H=PR[v][1];if(v=='spr')S.cols=12;page();insp();fit()}return}
 if(t.type=='number'&&isNaN(v))return;if(t.dataset.u)v/=UN[S.u].f;
 o[k]=v;if(sel){paint(sel);if(k=='text')layers()}else{page()}});
-rp.addEventListener('change',function(ev){var t=ev.target;if(t.dataset.f){upf(t.files[0]);return}if(t.type=='file'){img(t.files[0],sel);return}if(t.dataset.k)commit()});
+rp.addEventListener('change',function(ev){var t=ev.target;if(t.dataset.f){upf(t.files[0]);return}if(t.type=='file'){img(t.files[0],sel);return}if(t.dataset.k){if(sel&&t.dataset.k=='cols')insp();commit()}});
 rp.addEventListener('click',function(ev){var a=ev.target.dataset.a;if(!a)return;
 if(a=='por'||a=='lan'){if((S.H>S.W)!=(a=='por')){var t=S.W;S.W=S.H;S.H=t}page();insp();fit()}
 else if(a=='fr')sel.z=++zt;else if(a=='bk')sel.z=Math.min.apply(0,S.els.map(function(x){return x.z}))-1;
-else if(a=='fit'){sel.x=S.m;sel.w=S.W-2*S.m}else if(a=='nf')sel.fill='';else if(a=='dup')return dup();else if(a=='del')return del();
+else if(a=='fit'){sel.x=S.m;sel.w=S.W-2*S.m}else if(a=='nf')sel.fill='';
+else if(/^c[1-8]$/.test(a))sel.cols=+a.slice(1);
+else if(a=='gr'){sel.x=S.m;sel.w=S.W-2*S.m;sel.cols=S.cols;sel.cg=S.g}
+else if(a=='dup')return dup();else if(a=='del')return del();
 if(sel){paint(sel);insp();layers()}commit()});
 function img(f,e){if(!f||!e)return;var r=new FileReader();r.onload=function(){var i=new Image();i.onload=function(){var c=document.createElement('canvas'),s=Math.min(1,1600/Math.max(i.width,i.height));c.width=i.width*s;c.height=i.height*s;c.getContext('2d').drawImage(i,0,0,c.width,c.height);IM[++ik]=c.toDataURL('image/jpeg',.85);e.src=ik;paint(e);commit()};i.src=r.result};r.readAsDataURL(f)}
 /* ---- history ---- */
@@ -271,7 +281,11 @@ var TP=[
 {n:'Budget',e:[kk('The numbers'),['head',.6,.9,7,1.1,{text:'Budget Execution',size:56}],['deck',.6,2.1,5.4,1.2,{text:'Two-thirds of capital is committed to eco-construction and core infrastructure — building the experience before marketing it.'}],['stat',.6,3.8,3,1.4,{text:'65%',size:110}],['num',3.9,3.8,3.85,4.5,{size:12,text:'Eco-Construction — 35%\nInfrastructure — 30%\nCulinary School — 15%\nEnergy — 10%\nMarketing — 10%'}]]},
 {n:'Why us',e:[['head',.6,.6,3,1,{text:'Why Us?',size:56}],['deck',3.8,.75,4,.9,{text:'Eco-friendly beacon: a commitment to environmental stewardship.'}],['photo',-.125,2,8.625,5.3,{g:4}],['body',.6,7.7,3.4,1.6,{text:'Sustainable Construction\nInfrastructure designed using eco-friendly materials.',drop:0,align:'left'}],['body',4.35,7.7,3.4,1.6,{text:'Intimate & Immersive\nA departure from traditional opulent hotels.',drop:0,align:'left'}]]},
 {n:'Back cover',e:[['photo',-.125,-.125,8.625,11.125,{g:5}],['head',.6,3.8,7.2,1.5,{text:'Ready to Elevate?',size:60,align:'center',color:LT}],['kick',.6,5.4,7.15,.3,{text:'Inquiries · Partnerships · Site visits',align:'center',color:LT}]]}];
-function tpl(k){var t=TP[k],kx=S.W/8.375,ky=S.H/10.875;sync();$('#app').dataset.s='';if(S.els.length){S.pages.splice(S.i+1,0,{els:[],gd:[]});show(S.i+1,1)}
+function tpl(k){var t=TP[k];sync();$('#app').dataset.s='';
+if(t.sz&&!S.sp&&S.pages.length==1&&!S.els.length){S.W=PR[t.sz][0];S.H=PR[t.sz][1];page();fit()}
+var kx=S.W/8.375,ky=S.H/10.875;
+if(S.els.length){S.pages.splice(S.i+1,0,{els:[],gd:[]});show(S.i+1,1)}
+if(t.bg){S.bg=t.bg;page()}
 t.e.forEach(function(a){var p=Object.assign({},a[5]);p.w=a[3]*kx;p.h=a[4]*ky;add(a[0],a[1]*kx,a[2]*ky,p)});select(null);commit()}
 TP.forEach(function(t,k){var b=document.createElement('button');b.textContent=t.n;b.onclick=function(){tpl(k)};$('#tp').appendChild(b)});
 /* fonts */
@@ -287,18 +301,20 @@ x.save();x.globalAlpha=e.op/100;x.beginPath();if(x.roundRect)x.roundRect(X,Y,W,H
 if(e.t=='photo'&&!IM[e.src]){var g=x.createLinearGradient(0,Y,0,Y+Hh);g.addColorStop(0,PG[e.g][0]);g.addColorStop(1,PG[e.g][1]);x.fillStyle=g;x.fillRect(X,Y,W,Hh)}
 else if(e.fill){x.fillStyle=e.fill;x.fillRect(X,Y,W,Hh)}
 if(e.t=='photo'&&IM[e.src]){var m=IMG[e.src],s=(e.fit=='cover'?Math.max:Math.min)(W/m.width,Hh/m.height),dw=m.width*s,dh=m.height*s;var pxx=(e.px==null?50:e.px)/100,pyy=(e.py==null?50:e.py)/100,zm=e.zm||1,ox=W*pxx,oy=Hh*pyy,x0=(W-dw)*pxx,y0=(Hh-dh)*pyy;x.drawImage(m,X+ox+zm*(x0-ox),Y+oy+zm*(y0-oy),dw*zm,dh*zm)}
-if(TX.indexOf(e.t)>-1){var cn=e.cols||1,gp=.25*k,cw=(W-gp*(cn-1))/cn,li=e.t=='num'||e.t=='bul',ind=li?fs*(e.t=='num'?2.3:1.2):0,bl=[],tx=e.upper?e.text.toUpperCase():e.text,cap='',capw=0,ty=Y,CF='400 '+fs*4.4+'px "Playfair Display",serif';
+if(TX.indexOf(e.t)>-1){var cn=e.cols||1,gp=(e.cg==null?.25:e.cg)*k,cw=(W-gp*(cn-1))/cn,li=e.t=='num'||e.t=='bul',ind=li?fs*(e.t=='num'?2.3:1.2):0,bl=[],tx=e.upper?e.text.toUpperCase():e.text,cap='',capw=0,ty=Y,CF='400 '+fs*4.4+'px "Playfair Display",serif';
 x.textBaseline='alphabetic';x.font=(e.italic?'italic ':'')+e.weight+' '+fs+'px "'+e.font+'",Georgia,serif';if('letterSpacing' in x)x.letterSpacing=e.ls*fs+'px';
 if(e.t=='quote'){x.fillStyle=e.ac;x.fillRect(X,Y,W,2*q);ty=Y+12*q;Hh-=12*q}
 if(e.drop&&e.t=='body'&&tx){cap=tx[0];tx=tx.slice(1);x.save();x.font=CF;capw=x.measureText(cap).width+fs*.1;x.restore()}
 tx.split('\n').forEach(function(p,pi){var d=pi==0&&cap,L=wr(x,p,function(i){return cw-ind-(d&&i<3?capw:0)});
 if(li)bl.push({L:L,h:L.length*lh+fs});else L.forEach(function(s,i){bl.push({s:s,h:lh,o:d&&i<3?capw:0,l:i==L.length-1})})});
+var CH=Hh;if(cn>1&&e.cf!='auto'){var lo2=lh,hi2=Hh;for(var it=0;it<14;it++){var md=(lo2+hi2)/2,cc=0,yy=0,ok=1;for(var bi=0;bi<bl.length;bi++){var BB=bl[bi];if(yy+BB.h>md+1&&yy>0){cc++;yy=0}if(cc>=cn){ok=0;break}yy+=BB.h}if(ok)hi2=md;else lo2=md}CH=hi2}
 var c=0,y=0,n=0;
-bl.forEach(function(B){if(y+B.h>Hh+1&&y>0){c++;y=0}if(c>=cn)return;var cx=X+c*(cw+gp),T=ty+y;x.fillStyle=e.color;
+bl.forEach(function(B){if(y+B.h>CH+1&&y>0){c++;y=0}if(c>=cn)return;var cx=X+c*(cw+gp),T=ty+y;x.fillStyle=e.color;
 if(li){n++;B.L.forEach(function(s,i){dl(x,s,cx+ind,T+fs*.5+i*lh+(lh-fs)/2+fs*.82,cw-ind,e.align,1)});
 x.save();x.fillStyle=e.ac;if(e.t=='num'){x.font='400 '+fs*1.9+'px "Playfair Display",serif';x.fillText((n<10?'0':'')+n,cx,T+fs*1.75)}else{x.beginPath();x.arc(cx+fs*.25,T+fs*1.25,fs*.25,0,7);x.fill()}x.restore();
 x.fillStyle='rgba(0,0,0,.2)';x.fillRect(cx,T+B.h-q,cw,q)}
 else dl(x,B.s,cx+B.o,T+(lh-fs)/2+fs*.82,cw-B.o,e.align,B.l);y+=B.h});
+if(e.cr&&cn>1){x.fillStyle='rgba(0,0,0,.28)';for(var ci=1;ci<cn;ci++)x.fillRect(X+ci*(cw+gp)-gp/2,ty,q,CH)}
 if(cap){x.font=CF;x.fillStyle=e.ac;x.fillText(cap,X,ty+2*lh+(lh-fs)/2+fs*.82)}}
 if(e.bw){x.strokeStyle=e.bc;x.lineWidth=e.bw*q*2;x.strokeRect(X,Y,W,Hh)}
 x.restore()}
@@ -447,7 +463,7 @@ var _p=pgs;pgs=function(){_p();thumbs()};
 var as=document.createElement('span');as.id='as';as.style.opacity='.6';$('#top').appendChild(as);
 var _c=commit;commit=function(){_c();as.textContent='Saved '+new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})};
 /* style, focal, autofit */
-var K=['font','size','weight','lh','ls','color','align','italic','upper','cols'],CS=null,b=document.createElement('div');
+var K=['font','size','weight','lh','ls','color','align','italic','upper','cols','cg','cf','cr'],CS=null,b=document.createElement('div');
 b.innerHTML='<h3>Selected element</h3><div class="r"><button id="sc1">Copy style</button><button id="sc2">Paste style</button><button id="sc3">Match all of this type</button><button id="sf">Fit text to box</button></div><label>Photo focus<select id="fc"><option value="">Centre</option><option value="50% 20%">Top (faces)</option><option value="50% 80%">Bottom</option><option value="20% 50%">Left</option><option value="80% 50%">Right</option></select></label>';
 T.d.appendChild(b);
 $('#sc1').onclick=function(){if(!sel)return;CS={};K.forEach(function(k){CS[k]=sel[k]})};
@@ -586,14 +602,13 @@ sc.addEventListener('touchstart',function(e){if(cm&&sel&&e.touches.length==2){e.
 sc.addEventListener('touchmove',function(e){if(cm&&sel&&pd2&&e.touches.length==2){e.stopPropagation();e.preventDefault();setZ(z0*dist(e)/pd2)}},{capture:true,passive:false});
 sc.addEventListener('touchend',function(){pd2=0},true);
 addEventListener('keydown',function(e){if(e.key=='Escape'&&cm)crop(0)});
-/* ---- mobile: contextual action bar, view menu, panel dismissal ---- */
+/* ---- mobile: contextual action bar, panel dismissal ---- */
 var fb=document.createElement('div');fb.id='fab';fb.innerHTML='<button data-a="s">Style</button><button data-a="c">Crop</button><button data-a="d">Copy</button><button data-a="x">Delete</button>';document.body.appendChild(fb);
 function fab(){fb.classList.toggle('on',!!sel);fb.querySelector('[data-a=c]').hidden=!(sel&&sel.t=='photo');fb.querySelector('[data-a=c]').textContent=cm?'Done':'Crop'}
 fb.onclick=function(e){var a=e.target.dataset.a;if(a=='s')$('#app').dataset.s='r';else if(a=='c')crop(!cm);else if(a=='d')dup();else if(a=='x')del()};
 var _sel=select;select=function(e){_sel(e);if(cm&&(!sel||sel.t!='photo'))crop(0);$('#cz').value=sel&&sel.zm||1;fab()};
-var vw=document.createElement('button');vw.id='vw';vw.textContent='View';vw.onclick=function(){$('#top').classList.toggle('vo')};$('#top').insertBefore(vw,$('#top').children[1]);
 sc.addEventListener('pointerdown',function(e){if(innerWidth<=860&&$('#app').dataset.s&&$('#app').dataset.s!='f'&&(e.target===sc||e.target===sz))$('#app').dataset.s=''});
-var css=document.createElement('style');css.textContent='#pg.crop .el.sel{outline-style:dashed!important;cursor:grab}#pg.crop .hd{display:none}#fab,#vw{display:none}button{touch-action:manipulation}@media(max-width:860px){#vw{display:inline-block}#top label{display:none}#top.vo{flex-wrap:wrap;overflow:visible;white-space:normal}#top.vo label{display:flex}#fab.on{display:flex;position:fixed;left:8px;right:8px;bottom:calc(54px + env(safe-area-inset-bottom,0px));z-index:10;gap:6px;background:var(--pn);border:1px solid var(--ln);border-radius:10px;padding:6px;box-shadow:0 4px 16px rgba(0,0,0,.3)}#fab button{flex:1;min-height:42px}#lp,#rp{max-height:62vh}#tb button{min-height:46px}}@media(max-width:860px) and (orientation:landscape){#lp,#rp{top:0;bottom:calc(46px + env(safe-area-inset-bottom,0px));height:auto;max-height:none;width:min(340px,55vw);left:auto;right:0}#lp{left:0;right:auto}#fab.on{left:auto;width:min(360px,60vw)}}';document.head.appendChild(css);
+var css=document.createElement('style');css.textContent='#pg.crop .el.sel{outline-style:dashed!important;cursor:grab}#pg.crop .hd{display:none}#fab{display:none}button{touch-action:manipulation}@media(max-width:860px){#fab.on{display:flex;position:fixed;left:8px;right:8px;bottom:calc(54px + env(safe-area-inset-bottom,0px));z-index:10;gap:6px;background:var(--pn);border:1px solid var(--ln);border-radius:10px;padding:6px;box-shadow:0 4px 16px rgba(0,0,0,.3)}#fab button{flex:1;min-height:42px}#lp,#rp{max-height:62vh}#tb button{min-height:46px}}@media(max-width:860px) and (orientation:landscape){#lp,#rp{top:0;bottom:calc(46px + env(safe-area-inset-bottom,0px));height:auto;max-height:none;width:min(340px,55vw);left:auto;right:0}#lp{left:0;right:auto}#fab.on{left:auto;width:min(360px,60vw)}}';document.head.appendChild(css);
 /* ---- reference layouts (spreads, positions traced from your images) ---- */
 var F1=[107,88,970,685],F2=[45,122,675,578],F3=[47,37,648,440];
 function Q(F,t,a,b_,c,d,p){var w=F[2]-F[0],h=F[3]-F[1];return[t,(a-F[0])/w*16.75,(b_-F[1])/h*10.875,(c-a)/w*16.75,(d-b_)/h*10.875,p||{}]}
@@ -615,12 +630,205 @@ var K={font:CS,size:6.5,ls:.04,upper:1,lh:1.35,color:'#1d1d1d',weight:400},kk3=f
 hdr=[kk3(.6,.55,2.3,'LETTER OF APPOINTMENT\nHUDSON FARMHOUSE\nDATE 01.10.2024'),kk3(3.3,.55,2,'185 ALMEDA ROAD\nGARRISON, NY\n10524'),kk3(5.5,.55,2.3,'INFO@GARRISONFOUNDRY.COM\n+(1) 759-0431'),['head',.6,2.2,3,.9,{font:CS,size:20,lh:1,upper:1,weight:400,ls:0,text:'GARRISON\nFOUNDRY'}]];
 var LT2=[{n:'Architect letterhead',e:hdr.concat([kk3(.6,4.4,2.3,'GARRISON, NY\n4,900 SQ FT\nCOMPLETION 2018'),kk3(3.3,4.4,2,'JOSEPH MARTIN\nAND JENNIFER\nKOMOROWSKI'),kk3(5.5,4.4,2.3,'185 ALMEDA ROAD\nGARRISON, NY\n10524',{weight:700}),['rule',.6,5.2,7.2,.01,{}],['body',.6,5.5,2,.9,{font:CS,size:8,lh:1.4,drop:0,align:'left',text:'Attn:\nJoseph Martin\n185 Almeda Road\nGarrison, NY'}],kk3(3.3,5.5,4.4,'LAYOUT UPDATES\nMATERIAL REFINEMENT',{weight:700}),['body',3.3,6.2,4.5,3.8,{font:CS,size:8.5,lh:1.55,drop:0,align:'justify',text:L}]])},
 {n:'Project sheet (photo)',e:hdr.concat([kk3(.6,4.05,2.3,'GARRISON, NY\n4,900 SQ FT'),kk3(3.3,4.05,2,'JOSEPH MARTIN\nAND JENNIFER'),kk3(5.5,4.05,2.3,'185 ALMEDA ROAD\nGARRISON, NY',{weight:700}),['photo',0,4.85,8.375,6.025,{g:3}],['box',5.6,9.4,2.6,1.2,{fill:'#d9d2c6'}]])}];
-var h3=document.createElement('h3');h3.textContent='Reference layouts · spreads';var g=document.createElement('div');g.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:5px';
 function tplS(t){$('#app').dataset.s='';if(!S.sp)spr(1);sync();if(S.els.length){S.pages.splice(S.i+1,0,{els:[],gd:[]});show(S.i+1,1);sgd()}if(t.bg){S.bg=t.bg;page()}var kx=S.W/16.75,ky=S.H/10.875;t.e.forEach(function(a){add(a[0],a[1]*kx,a[2]*ky,Object.assign({},a[5],{w:a[3]*kx,h:a[4]*ky}))});select(null);if(S.fo&&S.fo.on)refoot();else commit()}
-function bt(t,fn){var x=document.createElement('button');x.textContent=t.n;x.style.textAlign='left';x.onclick=fn;g.appendChild(x)}
-TS.forEach(function(t){bt(t,function(){tplS(t)})});LT2.forEach(function(t){var k=TP.push(t)-1;bt(t,function(){tpl(k)})});
-tA.insertBefore(g,tA.firstChild);tA.insertBefore(h3,g);
+LT2.forEach(function(t){TP.push(t)});
+window.TS=TS;window.tplS=tplS;
 fab();
+})();
+
+/* ---- v7: more layouts, one layout browser, columns on every text element, grouped panels ---- */
+(function(){
+var css=document.createElement('style');
+css.textContent='details.sec{border-bottom:1px solid var(--ln);margin:0 0 2px}details.sec>summary{cursor:pointer;list-style:none;font-size:10px;letter-spacing:.14em;text-transform:uppercase;opacity:.85;padding:9px 0;font-weight:600;user-select:none}details.sec>summary::-webkit-details-marker{display:none}details.sec>summary::before{content:"▸";display:inline-block;width:12px}details.sec[open]>summary::before{content:"▾"}details.sec>*:last-child{margin-bottom:10px}'+
+'.r button.on{background:var(--ac);color:#fff;border-color:var(--ac)}'+
+'#top .g{display:flex;gap:4px;align-items:center;padding-left:10px;border-left:1px solid var(--ln)}#top b+.g{border-left:0;padding-left:0}#vd{position:relative}#vd summary{list-style:none;cursor:pointer;padding:4px 8px;border:1px solid var(--ln);border-radius:4px}#vd summary::-webkit-details-marker{display:none}#vd summary::after{content:" ▾"}#vd[open] summary{border-color:var(--ac);color:var(--ac)}.pop{position:absolute;top:calc(100% + 4px);left:0;z-index:60;background:var(--pn);border:1px solid var(--ln);border-radius:6px;padding:8px 12px;box-shadow:0 8px 24px rgba(0,0,0,.3);min-width:140px}.pop label{padding:3px 0}'+
+'@media(max-width:860px){#vd{position:static}.pop{position:fixed;top:52px;left:8px}}'+
+'#lq{width:100%;margin:2px 0 4px;background:var(--bg);border:1px solid var(--ln);border-radius:3px;padding:4px 6px}.chips{display:flex;flex-wrap:wrap;gap:4px;margin:4px 0 8px}.chips button{padding:2px 7px;font-size:11px;border-radius:99px}.chips .on{background:var(--ac);color:#fff;border-color:var(--ac)}#lg{display:grid;grid-template-columns:1fr 1fr;gap:5px}#lg button{text-align:left;line-height:1.25}#lg small{display:block;opacity:.6;font-size:9px;text-transform:uppercase;letter-spacing:.08em}';
+document.head.appendChild(css);
+document.addEventListener('click',function(e){var d=$('#vd');if(d&&d.open&&!d.contains(e.target))d.open=false});
+
+/* ---------- new layouts ---------- */
+var FR=function(F,t,a,b,c,d,p){var w=F[2]-F[0],h=F[3]-F[1];return[t,(a-F[0])/w*16.75,(b-F[1])/h*10.875,(c-a)/w*16.75,(d-b)/h*10.875,p||{}]};
+var mix=function(a,b){return Object.assign({},a,b)};
+var LO='Massa sed elementum tempus egestas. Cursus risus at ultrices mi tempus imperdiet nulla malesuada. Suscipit adipiscing bibendum est ultricies integer quis auctor. Risus commodo viverra maecenas accumsan.\n\nOdio morbi quis commodo odio aenean sed. Sem fringilla ut morbi tincidunt augue interdum. Consectetur lorem donec massa sapien faucibus et molestie ac feugiat.',LL=LO+'\n\n'+LO,
+LI='Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat.\n\nDuis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi.',
+SH='A few lines of copy describe the object, its maker and the story behind it, set small beside the image.';
+var TSN=[],TPN=[];
+
+/* Spread: airy page, small text + portrait */
+TSN.push({n:'Airy text + portrait',bg:'#f3f1ec',e:[
+['cap',.6,.55,4,.25,{text:'The Origin of Culture',font:'Inter',size:6.5,color:'#111'}],
+['body',8.4,.6,4.6,3.6,{text:LL,font:'Inter',size:6.5,lh:1.6,align:'left',drop:0,color:'#222'}],
+['photo',13.25,.6,2.9,3.9,{g:1}],
+['cap',.6,10.2,3,.25,{text:'Buildings',font:'Inter',size:6.5,color:'#111'}],
+['cap',7.4,10.2,2,.25,{text:'Various ancient',font:'Inter',size:6.5,color:'#111',align:'center'}],
+['cap',12.6,10.2,3.6,.25,{text:'The Origin of Culture',font:'Inter',size:6.5,color:'#111',align:'right'}]]});
+TSN.push({n:'Wide photo, small text',bg:'#f3f1ec',e:[
+['photo',-.125,2.95,17,8.05,{g:2}],
+['cap',.6,.55,4,.25,{text:'The Origin of Culture',font:'Inter',size:6.5,color:'#111'}],
+['body',8.4,.6,7.2,1.6,{text:LO,font:'Inter',size:6.5,lh:1.6,align:'left',drop:0,color:'#222',cols:2,cg:.3}]]});
+/* Spread: architecture panel + full-height photo (Atherton) */
+(function(){var F=[122,112,1075,786],I={font:'Inter',color:'#111',weight:400};
+TSN.push({n:'Architecture panel',bg:'#e5e5df',e:[
+FR(F,'box',122,112,600,786,{fill:'#e5e5df'}),
+FR(F,'head',130,120,290,160,mix(I,{size:13,lh:1.15,ls:-.01,text:'Atherton\nCA'})),
+FR(F,'deck',306,120,570,300,mix(I,{size:17,lh:1.2,ls:-.01,italic:0,text:'Lifting the pavilion’s concrete foundations at the front and rear of each pavilion creates an edge – giving the illusion that the structures are hovering over the lush landscaping below.'})),
+FR(F,'body',306,615,575,705,mix(I,{size:5.5,lh:1.5,align:'left',drop:0,color:'#222',text:'Feldman Architecture is an innovative residential and commercial design practice recognized for creating warm, light-filled spaces that are site-sensitive and carefully detailed.\n\nLight-filled spaces that are site-sensitive and carefully detailed. Highly collaborative in nature, the firm approaches design as a dialogue between client, design team and site.'})),
+FR(F,'cap',306,716,480,738,mix(I,{size:5.5,weight:600,text:'Landscape Architect\nContractor'})),
+FR(F,'head',130,757,290,782,mix(I,{size:13,lh:1.1,ls:-.01,text:'Plot size:'})),
+FR(F,'head',306,757,440,782,mix(I,{size:13,lh:1.1,ls:-.01,text:'22,000 sqft'})),
+FR(F,'cap',452,761,570,782,mix(I,{size:5,color:'#222',text:'Feldman 2022    20,000 sqft\nLand at property:    4 acres'})),
+FR(F,'photo',600,112,1075,786,{g:3})]})})();
+/* Spreads: magazine with cut-out objects and coloured headlines */
+(function(){var F=[275,178,1130,772],
+WD={font:'Oswald',weight:600,upper:1,size:32,lh:1,ls:.01,align:'left'},
+WB={font:'Lora',size:6,lh:1.5,align:'justify',drop:0,color:'#333',weight:400,italic:0,upper:0,ls:0},
+WC={font:'Inter',size:5.5,color:'#222',weight:400,ls:.05,upper:1,italic:0},
+hd=function(a,b,c,d,col,t,z){return FR(F,'head',a,b,c,d,mix(WD,{color:col,text:t,size:z||32}))},
+bd=function(a,b,c,d,t,p){return FR(F,'body',a,b,c,d,mix(WB,mix({text:t||SH},p||{})))},
+ph=function(a,b,c,d,g){return FR(F,'photo',a,b,c,d,{g:g})},
+cp=function(a,b,c,d,t,p){return FR(F,'cap',a,b,c,d,mix(WC,mix({text:t},p||{})))};
+TSN.push({n:'Cut-out objects',bg:'#ffffff',e:[
+cp(300,208,420,220,'WANDER'),cp(1000,220,1108,232,'CULTURE',{align:'right'}),
+hd(325,247,668,285,'#4a6b2f','The Twin Carp'),bd(412,287,608,322),ph(315,290,520,383,4),
+hd(345,425,540,460,'#1e5a2a','Ceramic Boots'),bd(410,466,548,540),ph(548,340,700,582,2),
+hd(355,565,610,630,'#a5801c','Ancestral\nJar'),bd(395,648,600,700),ph(283,510,400,772,3),
+hd(780,238,940,300,'#6b7c99','The Lute\nPair'),bd(836,318,936,352),ph(940,208,1075,392,1),
+ph(703,325,810,675,5),hd(815,410,1040,480,'#b32d2b','Red Dragon\nVase'),bd(812,490,1025,532),
+hd(815,585,975,650,'#2f4c9a','Blue Glazed\nJar'),bd(806,668,990,722),ph(990,585,1120,772,1)]});
+TSN.push({n:'Giant initial + portrait',bg:'#ffffff',e:[
+cp(300,208,420,220,'WANDER'),cp(1000,220,1108,232,'CULTURE',{align:'right'}),
+FR(F,'head',325,238,560,300,mix(WD,{font:'Montserrat',weight:800,size:20,color:'#0b7a3e',lh:1,text:'THE CLAY\nMUSEUM'})),
+FR(F,'head',323,300,640,420,mix(WD,{font:'Montserrat',weight:800,size:118,lh:.85,color:'#0b7a3e',text:'CLAY'})),
+ph(480,250,780,772,0),
+FR(F,'stat',430,405,780,700,{font:'Playfair Display',italic:1,weight:700,size:330,lh:.8,color:'#0b7a3e',text:'B'}),
+cp(327,432,440,443,'content by A. Writer\nphoto by Museum',{italic:1,upper:0}),
+bd(325,455,510,540,'A short lead-in set in bold serif, four lines at most.\nSecond line of the verse\nThird line of the verse',{font:'Merriweather',weight:700,size:7,lh:1.5,color:'#111',align:'left'}),
+bd(325,553,530,742,LL,{font:'Merriweather',size:6,lh:1.55,drop:1,ac:'#0b7a3e',color:'#222'}),
+ph(752,226,1068,462,4),cp(900,466,1068,476,'The studio courtyard',{align:'right',upper:0,italic:1}),
+FR(F,'quote',770,485,850,672,{font:'Merriweather',italic:1,weight:700,size:8.5,lh:1.4,color:'#0b7a3e',ac:'#0b7a3e',align:'right',text:'“Twenty years of wandering behind me, and the best skill is patience in the hands.”'}),
+ph(862,482,1068,630,2),bd(862,638,1068,748,LL,{cols:2,cg:.2,cf:'balance'})]});
+TSN.push({n:'Colour-field feature',bg:'#5b3d94',e:[
+cp(300,208,420,220,'WANDER',{color:'#e6dcf5'}),cp(1000,220,1108,232,'CULTURE',{align:'right',color:'#e6dcf5'}),
+FR(F,'head',330,245,700,510,mix(WD,{font:'Montserrat',weight:800,size:110,lh:.85,color:'#f4b63d',text:'ROYAL\nMUSIC'})),
+FR(F,'head',337,540,600,600,mix(WD,{size:28,lh:1.05,color:'#f0b73e',text:'Court music\nrevived'})),
+bd(500,618,690,735,LO,{font:'Merriweather',size:6.5,color:'#fff'}),
+bd(738,258,1035,470,LL,{cols:2,cg:.22,font:'Merriweather',size:6,color:'#fff',drop:1,ac:'#f0b73e'}),
+FR(F,'stat',722,530,790,600,{font:'Playfair Display',size:70,color:'#f0b73e',text:'“'}),
+FR(F,'quote',740,580,860,690,{font:'Merriweather',italic:1,size:7.5,lh:1.5,color:'#f0b73e',ac:'#5b3d94',text:'Come to the court and be the king for a day,\nthe river in perfumed mist, the mountain in song.'}),
+ph(830,430,1120,772,3),ph(1040,255,1120,450,5)]});
+TSN.push({n:'Photo left, headline right',bg:'#ffffff',e:[
+ph(275,178,703,772,0),
+cp(325,210,400,222,'WANDER',{color:'#ddd'}),cp(1000,210,1108,222,'LIKE A LOCAL',{align:'right'}),
+FR(F,'head',750,265,1075,400,mix(WD,{size:34,lh:1.08,color:'#2a2a2a',text:'Water lilies\nin the flood\nseason'})),
+cp(750,461,850,490,'content by\nA. Writer\nB. Writer',{upper:0}),cp(805,461,905,490,'photo by\nC. Photographer',{upper:0}),
+FR(F,'deck',750,517,935,625,{font:'Merriweather',italic:0,weight:700,size:8,lh:1.5,color:'#1f4f8a',text:'Gentle and pure, the water lily has long stood for happiness and perfection. In the flood season the fields turn pink and violet.'}),
+bd(966,462,1075,725,LL,{drop:1,ac:'#1f4f8a',font:'Merriweather'}),bd(750,640,935,735,LO,{font:'Merriweather'}),
+cp(1040,738,1075,750,'9',{align:'right'})]})})();
+/* Spreads: book, blue duotone (Book category) */
+(function(){var BL='#1e2f8c',LC='Libre Caslon Text',BD='Bodoni Moda',
+bt=function(p){return mix({font:LC,color:BL,upper:0,ls:0,weight:400},p)};
+TSN.push({n:'Book essay (blue)',c:'Book',bg:'#f7f6f1',e:[
+['head',1.1,.8,6.2,3.6,bt({font:BD,size:40,lh:1.05,upper:1,align:'center',text:'Common Things\nand Forgotten\nTreasures'})],
+['cap',1.1,4.6,6.2,.3,bt({size:7,upper:1,ls:.12,align:'center',color:BL,text:'Marie-Charlotte Author'})],
+['body',1.1,5.2,6.2,4.6,bt({size:8.5,lh:1.5,align:'justify',drop:0,text:LL})],
+['cap',1.1,10.15,6.2,.25,bt({size:7,align:'center',text:'56'})],
+['kick',9.7,.5,6.2,.3,bt({size:6,ls:.1,upper:1,align:'center',text:'Common things and forgotten treasures'})],
+['photo',9.7,1.1,3.7,4.1,{g:2}],['photo',13.6,1.1,2.4,2.6,{g:4}],
+['cap',13.6,3.8,2.4,.9,bt({size:5.5,text:'1. Portrait with jewellery\nAlgeria, c. 1900\nMuseum collection'})],
+['body',9.7,5.5,6.3,4.4,bt({size:7.8,lh:1.5,align:'justify',drop:0,cols:2,cg:.25,text:LL})],
+['cap',9.7,10.15,6.2,.25,bt({size:7,align:'center',text:'57'})]]});
+TSN.push({n:'Book chapter divider',c:'Book',bg:'#ffffff',e:[
+['box',-.125,-.125,8.5,11.125,{fill:'#1d2f86'}],
+['head',9.4,2.3,6.6,6.4,{font:BD,weight:400,size:50,lh:1.3,upper:1,align:'center',color:'#161616',text:'Voyage\nThrough\nCoins'}]]});
+TSN.push({n:'Book plates (white | black)',c:'Book',bg:'#ffffff',e:[
+['box',8.375,-.125,8.5,11.125,{fill:'#0d0d0d'}],
+['photo',1.4,1.4,2.7,6.4,{g:3}],['photo',4.6,1.4,2.7,6.4,{g:5}],
+['cap',1.4,8.4,2.7,1.2,{font:LC,size:6,color:'#111',align:'center',text:'Fibula\nBerber people, Morocco\n20th century\nSilver'}],
+['cap',4.6,8.4,2.7,1.2,{font:LC,size:6,color:'#111',align:'center',text:'Fibula\nBerber people, Morocco\n20th century\nSilver'}],
+['photo',9.6,1.4,6.2,6.6,{g:1}],
+['cap',9.6,8.4,6.2,1.2,{font:LC,size:6,color:'#eee',align:'center',text:'Necklace of silver coins\nBerber people\nAmber, silver, enamel'}],
+['cap',7.2,10.2,1,.25,{font:LC,size:7,color:'#111',align:'right',text:'188'}],['cap',9.4,10.2,1,.25,{font:LC,size:7,color:'#eee',text:'189'}]]});
+TSN.push({n:'Book part opener',c:'Book',bg:'#ffffff',e:[
+['photo',-.125,-.125,8.5,11.125,{g:3}],
+['head',9.4,3.4,6.6,.7,{font:BD,size:22,align:'center',color:'#161616',text:'III'}],
+['head',9.4,4.3,6.6,2.6,{font:BD,weight:400,size:44,lh:1.15,upper:1,align:'center',color:'#161616',text:'Textile\nFairy Tales'}],
+['deck',9.4,9.3,6.6,.8,{font:LC,italic:1,size:12,align:'center',color:'#161616',text:'Threads of gifts\nand counter-gifts'}]]})})();
+TSN.forEach(function(t){window.TS.push(t)});
+
+/* Page layouts */
+TPN.push({n:'Brand letterhead',c:'Letterhead',sz:'let',bg:'#f1f1ef',e:[
+['box',.6,.68,.58,.58,{fill:'',bw:2,bc:'#2b2b2b',rad:999}],
+['head',.6,.8,.58,.4,{font:'Montserrat',weight:700,size:17,align:'center',color:'#2b2b2b',lh:1,ls:0,text:'B'}],
+['head',1.75,.86,3,.35,{font:'Jost',weight:300,size:12,ls:.04,color:'#555',lh:1,text:'YOURBRAND'}],
+['rule',7.42,.66,.3,.01,{fill:'#333'}],
+['cap',5.6,.95,2.13,.5,{font:'Montserrat',size:6,align:'right',color:'#555',lh:1.5,text:'Your Address\nCity, district'}],
+['rule',7.42,1.35,.3,.01,{fill:'#333'}],
+['cap',5.6,1.6,2.13,.7,{font:'Montserrat',size:6,align:'right',color:'#555',lh:1.5,text:'+00 000 0000 000\nyourbrand@mail.com\nmain@mail.com'}],
+['cap',.6,2.0,2,.2,{font:'Montserrat',size:6,color:'#555',text:'Date / Month / Year'}],
+['head',.6,3.13,2,.3,{font:'Montserrat',weight:700,size:8,color:'#222',lh:1.2,ls:0,text:'Letter To :'}],
+['body',.6,3.42,1.9,.9,{font:'Montserrat',size:6.2,lh:1.7,align:'left',drop:0,color:'#444',text:'Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam'}],
+['head',2.8,3.13,4.9,.3,{font:'Montserrat',weight:700,size:8.5,color:'#222',lh:1.2,ls:0,text:'Hello, we are Brand Name'}],
+['body',2.8,3.45,4.95,4.7,{font:'Montserrat',size:6.4,lh:1.85,align:'justify',drop:0,color:'#444',text:LI}],
+['cap',2.8,8.6,3,.3,{font:'Montserrat',size:6.2,color:'#444',text:'Person In Charge'}],
+['cap',2.8,9.25,3,.3,{font:'Montserrat',size:6.2,weight:700,color:'#222',text:'Creative Director'}],
+['rule',2.8,10.25,4.95,.01,{fill:'#333'}]]});
+TPN.push({n:'Cover letter (sidebar name)',c:'Letterhead',sz:'a4',bg:'#e6e3dc',e:[
+['cap',.6,.52,2.3,.55,{font:'Montserrat',size:6.5,color:'#222',lh:1.5,text:'To the attention of\nRebecca Miles\nof Concept Media'}],
+['cap',3.33,.52,3,.55,{font:'Montserrat',size:6.5,color:'#222',lh:1.5,text:'Subject:\nApplication for the role of\nExecutive Assistant'}],
+['cap',6.54,.52,1.3,.55,{font:'Montserrat',size:6.5,color:'#222',lh:1.5,text:'Milan,\n10 May 2029'}],
+['rule',.6,1.05,7.15,.01,{fill:'#b5b1a6'}],
+['head',.6,2.84,2.3,.9,{font:'Montserrat',weight:800,size:25,lh:.92,ls:0,color:'#1d1d1b',upper:1,text:'Laura\nBennett'}],
+['cap',.6,3.5,2.3,.3,{font:'Montserrat',weight:700,size:6.5,upper:1,ls:.05,color:'#1d1d1b',text:'Executive Assistant'}],
+['box',2.96,2.77,.012,7.3,{fill:'#9d998d'}],
+['body',3.33,2.77,4.45,5.6,{font:'Montserrat',size:7.2,lh:1.5,align:'left',drop:0,color:'#222',text:'Dear Rebecca Miles,\n\nI am writing to submit my application for the role of Executive Assistant, with the aim of contributing practical support to the daily running of the management team.\n\nOver my career I have built strong skills in managing executive diaries, planning meetings and travel, and coordinating day-to-day activity. I work in an organised, methodical way that lets me set priorities and keep operations moving.\n\nI also handle communications and documents with care for every detail, and I have often been a point of reference for colleagues and management alike.\n\nI remain available for an interview and would be glad to explain how I can contribute to your work.\n\nThank you for your time,\nkind regards'}],
+['head',3.33,8.55,3,.8,{font:'Cormorant Garamond',italic:1,weight:400,size:26,lh:1,ls:0,color:'#1d1d1b',text:'Laura Bennett'}],
+['body',3.33,9.45,4,.9,{font:'Montserrat',size:6.5,lh:1.6,align:'left',drop:0,color:'#222',text:'Executive Assistant\n+123-456-7890\nhello@example.com\nexample.com'}]]});
+TPN.push({n:'Soft minimal title page',c:'Book',bg:'#e4e2da',e:[
+['head',3.4,1.6,4.4,1.5,{font:'Libre Caslon Text',weight:400,size:22,ls:.6,lh:1.3,upper:1,align:'right',color:'#1d1d1b',text:'Soft\nMinimal'}],
+['kick',3.9,6.85,3.9,.2,{font:'Libre Caslon Text',size:5,ls:.3,color:'#1d1d1b',text:'Norm Architects'}],
+['deck',3.9,7.1,3.9,.75,{font:'Libre Caslon Text',italic:0,size:14,lh:1.2,color:'#1d1d1b',text:'A Sensory Approach\nto Architecture & Design'}],
+['body',3.9,7.95,3.9,2.05,{font:'Libre Caslon Text',size:6.5,lh:1.55,align:'justify',drop:0,color:'#1d1d1b',text:LO}],
+['cap',3.9,10.1,3.9,.2,{font:'Libre Caslon Text',size:5,ls:.2,upper:1,color:'#1d1d1b',text:'Edition No. 1  |  Published by Publisher'}]]});
+TPN.push({n:'Magazine cover (masthead)',c:'Editorial',bg:'#f5f5f3',e:[
+['head',.5,.45,7.4,2.2,{font:'Bodoni Moda',weight:700,size:118,lh:.8,ls:-.03,upper:1,color:'#111',text:'Wander'}],
+['photo',.5,2.6,7.35,7.2,{g:4}],
+['head',3.6,7.6,4.2,1.6,{font:'Montserrat',weight:500,size:38,upper:1,ls:.04,lh:1,color:'#fff',text:'Son\nDoong'}],
+['deck',3.6,9.0,4.1,.5,{font:'Inter',italic:0,size:8,lh:1.4,color:'#fff',text:'The world’s largest cave, and the green hollow at its heart'}],
+['cap',.5,9.95,2.3,.5,{font:'Montserrat',weight:700,size:6.5,upper:1,color:'#111',lh:1.3,text:'Story one\nA short cover line'}],
+['cap',3.0,9.95,2.3,.5,{font:'Montserrat',weight:700,size:6.5,upper:1,color:'#111',lh:1.3,text:'Story two\nA short cover line'}],
+['cap',5.55,9.95,2.3,.5,{font:'Montserrat',weight:700,size:6.5,upper:1,color:'#111',lh:1.3,text:'Story three\nA short cover line'}]]});
+TPN.forEach(function(t){TP.push(t)});
+
+/* ---------- reorganise the left panel ---------- */
+var lp=$('#lp'),bar=$('#tbs'),tab={p:$('#tab_p'),d:$('#tab_d'),a:$('#tab_a'),j:$('#tab_j')},G={};
+Object.keys(tab).forEach(function(k){var t=tab[k];
+[].slice.call(t.children).forEach(function(n){if(n.tagName=='DIV'&&!n.id&&n.firstElementChild&&n.firstElementChild.tagName=='H3'){while(n.firstChild)t.insertBefore(n.firstChild,n);n.remove()}});
+var cur=null;
+[].slice.call(t.children).forEach(function(n){if(n.tagName=='H3'){var d=document.createElement('details'),s=document.createElement('summary'),nm=n.textContent.trim();d.className='sec';s.textContent=nm;d.appendChild(s);t.insertBefore(d,n);n.remove();cur=d;G[nm]=d}else if(cur)cur.appendChild(n)});
+});
+Object.keys(G).forEach(function(nm){var d=G[nm];if([].every.call(d.children,function(c,i){return i==0||c.hidden}))d.hidden=true});
+['Templates · adds a page','Creative layouts · adds a page','Reference layouts · spreads'].forEach(function(nm){if(G[nm]){G[nm].remove();delete G[nm]}});
+/* layout browser */
+var items=[],BR='Cover|Intro|Eight experiences|Feature|Village|Beach club|Community|Revenue|Phases|Budget|Why us|Back cover'.split('|'),CATS=['All','Brochure','Editorial','Spreads','Book','Letterhead'],st={c:'All',q:''};
+TP.forEach(function(t,k){items.push({n:t.n,c:t.c||(BR.indexOf(t.n)>-1?'Brochure':/etterhead|Project sheet/.test(t.n)?'Letterhead':'Editorial'),k:k,s:0})});
+window.TS.forEach(function(t,k){items.push({n:t.n,c:t.c||'Spreads',k:k,s:1})});
+var LY=document.createElement('details');LY.className='sec';LY.open=true;
+LY.innerHTML='<summary>Layouts</summary><input id="lq" placeholder="Search layouts…"><div class="chips" id="lc"></div><div id="lg"></div><div style="opacity:.65;margin-top:6px">Page layouts add a page. Spreads switch the document to facing pages.</div>';
+G.Layouts=LY;
+function ren(){$('#lc').innerHTML=CATS.map(function(c){return'<button data-c="'+c+'"'+(st.c==c?' class="on"':'')+'>'+c+'</button>'}).join('');
+var q=st.q.toLowerCase();$('#lg').innerHTML=items.map(function(it,i){return[it,i]}).filter(function(p){var it=p[0];return(st.c=='All'||it.c==st.c||(st.c=='Spreads'&&it.s))&&(!q||it.n.toLowerCase().indexOf(q)>-1||it.c.toLowerCase().indexOf(q)>-1)}).map(function(p){return'<button data-i="'+p[1]+'">'+esc(p[0].n)+'<small>'+(p[0].s?'spread':'page')+' · '+p[0].c+'</small></button>'}).join('')||'<div style="opacity:.65">No layouts match.</div>'}
+LY.addEventListener('click',function(e){var c=e.target.dataset.c,i=e.target.closest('button')&&e.target.closest('button').dataset.i;if(c){st.c=c;ren();return}if(i!=null){var it=items[+i];if(it.s)window.tplS(window.TS[it.k]);else tpl(it.k)}});
+LY.addEventListener('input',function(e){if(e.target.id=='lq'){st.q=e.target.value;ren()}});
+/* place the sections */
+function put(k,list,open){list.forEach(function(nm){var d=G[nm[0]];if(!d)return;d.querySelector('summary').textContent=nm[1]||nm[0];d.open=open.indexOf(nm[0])>-1;tab[k].appendChild(d)})}
+put('p',[['Pages','Page list'],['Pagination & spreads'],['Facing pages & typography','Gutter & typography'],['Master page']],['Pages','Pagination & spreads']);
+put('a',[['Layouts'],['Elements · click or drag','Elements']],['Layouts','Elements · click or drag']);
+put('d',[['Selected element','Text tools'],['Photo crop'],['Font pairings'],['Layers']],['Selected element','Layers']);
+put('j',[['Account'],['Account sync'],['New project'],['Letterhead','Quick start: letterhead'],['Preflight'],['Print & press PDF','Print / PDF']],['Preflight']);
+bar.insertBefore(bar.children[2],bar.children[1]);
+[].forEach.call(bar.children,function(b){b.textContent={p:'Pages',a:'Add',d:'Style',j:'Project'}[b.dataset.t]});
+ren();
 })();
 
 try{var sv=JSON.parse(localStorage.getItem('ls'));if(sv&&sv.S){IM=sv.IM||{};FT=sv.FT||{};fonts();load(sv.S);commit()}else start()}catch(e){start()}
