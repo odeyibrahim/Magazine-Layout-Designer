@@ -1263,6 +1263,55 @@ var _i=insp;insp=function(){_i();var e=sel;if(!e||!isT(e))return;var h='',L=e.t=
  h+=sec('bal','Type balance',selO('bal','Size change affects',[['off','Only this element'],['push','Push layout below'],['scale','Scale all text on page'],['both','Scale text + push layout']],S.bal||'off').replace('data-k="bal"','data-bal="1"')+'<div style="opacity:.65">Resize one text element and the others keep their proportions and spacing.</div>',1);
  var i=rp.innerHTML.indexOf('<details class="sec" data-o="col"');if(i>-1)rp.innerHTML=rp.innerHTML.slice(0,i)+h+rp.innerHTML.slice(i)};
 })();
+(function(){
+var $=function(s){return document.querySelector(s)},ready=0,tm=null,busy=0,pend=0,P0=P.length;
+function idb(){return new Promise(function(res,rej){var r=indexedDB.open('layoutstudio',1);r.onupgradeneeded=function(){r.result.createObjectStore('kv')};r.onsuccess=function(){res(r.result)};r.onerror=function(){rej(r.error)}})}
+function kv(m,k,v){return idb().then(function(d){return new Promise(function(res,rej){var t=d.transaction('kv',m=='get'?'readonly':'readwrite'),s=t.objectStore('kv'),q=m=='get'?s.get(k):s.put(v,k);t.oncomplete=function(){res(q.result)};t.onerror=t.onabort=function(){rej(t.error)}})})}
+function say(t){var a=$('#as'),b=$('#sv13');if(a)a.textContent=t;if(b)b.textContent=t}
+/* ---------- autosave ---------- */
+function flush(){clearTimeout(tm);if(!ready)return;if(busy){pend=1;return}busy=1;sync();var t=Date.now();
+ kv('set','cur',{d:full(),t:t}).then(function(){say('Saved on this device '+new Date(t).toLocaleTimeString())},function(){say('Browser storage blocked — use Save / load JSON')}).then(function(){busy=0;if(pend){pend=0;flush()}})}
+var _c=commit;commit=function(){_c();if(ready){clearTimeout(tm);tm=setTimeout(flush,600)}};
+document.addEventListener('visibilitychange',function(){if(document.hidden)flush()});addEventListener('pagehide',flush);
+try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
+/* ---------- versions ---------- */
+var sec=document.createElement('details');sec.className='sec';sec.open=true;
+sec.innerHTML='<summary>Saved versions (this browser)</summary><div id="sv13" style="opacity:.7;margin-bottom:4px">Not saved yet</div><div class="r"><input id="svn" placeholder="Version name" style="flex:1"><button id="sva">Save version</button></div><div id="svl"></div>';
+$('#tab_j').insertBefore(sec,$('#tab_j').firstChild);
+function list(){kv('get','snaps').then(function(a){a=a||[];$('#svl').innerHTML=a.map(function(s,i){return'<div class="r" style="align-items:center"><span style="flex:1">'+esc(s.n)+' <small style="opacity:.6">'+new Date(s.t).toLocaleString()+'</small></span><button data-r="'+i+'">Restore</button><button data-x="'+i+'">✕</button></div>'}).join('')||'<div style="opacity:.6">No versions yet.</div>'},function(){})}
+function addSnap(n){sync();return kv('get','snaps').then(function(a){a=a||[];a.unshift({n:n,t:Date.now(),d:full()});if(a.length>30)a.length=30;return kv('set','snaps',a)})}
+sec.onclick=function(e){var d=e.target.dataset;
+ if(e.target.id=='sva'){addSnap($('#svn').value.trim()||'Version').then(function(){$('#svn').value='';list()})}
+ else if(d.r!=null||d.x!=null)kv('get','snaps').then(function(a){a=a||[];if(d.x!=null){a.splice(+d.x,1);return kv('set','snaps',a).then(list)}
+  var s=a[+d.r];if(!s)return;addSnap('Auto · before restore').then(function(){var v=JSON.parse(s.d);IM=v.IM||{};FT=v.FT||{};fonts();load(v.S);hi=-1;H.length=0;commit();fit();list()})})};
+/* ---------- custom font pairings ---------- */
+var R=[['head','Headline'],['deck','Standfirst'],['body','Body'],['kick','Kicker']],
+ D0={head:['Playfair Display',400,-.01,1,0,0],deck:['Playfair Display',400,0,1.35,1,0],body:['Jost',400,0,1.6,0,0],kick:['Jost',500,.22,1.2,0,1]},
+ dl=document.createElement('datalist');dl.id='pfl';document.body.appendChild(dl);
+function fdl(){dl.innerHTML=FN.map(function(f){return'<option value="'+esc(f)+'">'}).join('')}fdl();
+var box=document.createElement('details');box.className='sec';box.open=true;
+box.innerHTML='<summary>Custom pairing</summary><label>Name<input id="upn" placeholder="My pairing"></label>'+R.map(function(r){var k=r[0];
+ return'<div style="margin:8px 0 2px;font-weight:600">'+r[1]+'</div><label>Font<input id="f_'+k+'" list="pfl" placeholder="Any Google font or uploaded"></label><label>Upload<input type="file" id="x_'+k+'" accept=".ttf,.otf,.woff,.woff2"></label><label>Weight<select id="w_'+k+'">'+[300,400,500,600,700,800].map(function(w){return'<option>'+w+'</option>'}).join('')+'</select></label><label>Tracking em<input type="number" id="t_'+k+'" step=".01"></label><label>Leading<input type="number" id="l_'+k+'" step=".05"></label><label>Italic<input type="checkbox" id="i_'+k+'"></label><label>Uppercase<input type="checkbox" id="u_'+k+'"></label>'}).join('')+
+ '<div class="r"><button id="ups">Save pairing</button><button id="upa">Save &amp; apply to page</button></div><div class="r"><button id="upl">Edit selected</button><button id="upd">Delete selected</button></div><div style="opacity:.65">Saved pairings (★) live in the project and appear in the list above. Type any Google Font name or upload a font file.</div>';
+$('#pf').closest('details').after(box);
+function wr(p){$('#upn').value=p.n||'';R.forEach(function(r){var k=r[0],a=p[k]||D0[k];$('#f_'+k).value=a[0];$('#w_'+k).value=a[1];$('#t_'+k).value=a[2];$('#l_'+k).value=a[3];$('#i_'+k).checked=!!a[4];$('#u_'+k).checked=!!a[5]})}
+function rd(){var o={n:($('#upn').value||'My pairing').trim()};R.forEach(function(r){var k=r[0];o[k]=[$('#f_'+k).value||D0[k][0],+$('#w_'+k).value,+$('#t_'+k).value||0,+$('#l_'+k).value||1.4,$('#i_'+k).checked?1:0,$('#u_'+k).checked?1:0]});return o}
+function sp(){P.length=P0;(S.up||[]).forEach(function(p){P.push(p)});var o=$('#pf'),v=o.value;
+ o.innerHTML=P.map(function(p,i){return'<option value="'+i+'">'+esc(p.n)+' — '+esc(p.head[0])+' / '+esc(p.body[0])+(i>=P0?' ★':'')+'</option>'}).join('');if(+v<P.length)o.value=v}
+function gfont(n){if(!n||FN.indexOf(n)>-1||document.fonts.check('12px "'+n+'"'))return;var l=document.createElement('link');l.rel='stylesheet';l.href='https://fonts.googleapis.com/css2?family='+n.replace(/ /g,'+')+':ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap';document.head.appendChild(l)}
+function save(apply){var o=rd();R.forEach(function(r){gfont(o[r[0]][0])});S.up=S.up||[];var i=S.up.findIndex(function(p){return p.n==o.n});if(i>-1)S.up[i]=o;else S.up.push(o);sp();$('#pf').value=P0+S.up.findIndex(function(p){return p.n==o.n});commit();if(apply)ap(P[+$('#pf').value])}
+$('#ups').onclick=function(){save(0)};$('#upa').onclick=function(){save(1)};
+$('#upl').onclick=function(){wr(P[+$('#pf').value]||D0)};
+$('#upd').onclick=function(){var i=+$('#pf').value-P0;if(i<0||!S.up||!S.up[i])return;S.up.splice(i,1);sp();commit()};
+R.forEach(function(r){var k=r[0];$('#x_'+k).onchange=function(){var f=this.files[0];if(!f)return;var n=f.name.replace(/\.[^.]+$/,'').replace(/[^\w \-]/g,'')||'Custom',rr=new FileReader();
+ rr.onload=function(){FT[n]=rr.result;rf(n,rr.result);$('#f_'+k).value=n;if(FN.indexOf(n)<0)FN.push(n);fdl();commit()};rr.readAsDataURL(f)};
+ $('#f_'+k).onfocus=fdl});
+var _l=load;load=function(o,id){_l(o,id);sp()};wr({n:''});sp();
+/* ---------- startup: restore last session ---------- */
+list();
+kv('get','cur').then(function(r){if(r&&r.d){try{var v=JSON.parse(r.d);IM=v.IM||{};FT=v.FT||{};fonts();load(v.S);hi=-1;H.length=0;commit();fit();say('Restored your last session ('+new Date(r.t).toLocaleString()+')')}catch(e){}}
+ ready=1;if(!r)flush()},function(){ready=1;say('Browser storage unavailable — use Save / load JSON')});
+})();
 </script>
 </body>
 </html>
