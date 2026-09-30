@@ -1007,6 +1007,82 @@ sec.onclick=function(e){var i=e.target.id;if(i=='mb'){if(!confirm('Replace the c
  var u=S.u;S=S0();S.u=u;load(S);['Cover','Intro','Eight experiences','Feature','Village','Beach club','Community','Tourism impact','Revenue','Phases','Budget','Why us','Back cover'].forEach(function(n){var k=-1;TP.forEach(function(t,j){if(t.n==n)k=j});tpl(k)});sync();S.pages.shift();show(0,1);window.refoot();fit()}
  else if(i=='ml'){tpl(l1);tpl(l2)}else if(i=='mi')tpl(ik)}
 })();
+
+/* ---- v10: on-canvas text editing, multi-select, copy/paste element + style, ruler toggle ---- */
+(function(){
+var $=function(s){return document.querySelector(s)},ms=[],keep=0,CB=[],SC=null,pc=0,multi=0,ed=null,lt={},mq=null,fab=$('#fab');
+var KS=['font','size','weight','lh','ls','color','align','italic','upper','cols','cg','cf','cr','ac','fill','bw','bc','rad','op'],TK=KS.slice(0,13);
+var st=document.createElement('style');st.textContent='.el.ms{outline:calc(1.5px*var(--iz)) solid #2b7fff}.el.ed{outline:calc(1.5px*var(--iz)) solid #ff7a1a!important;cursor:text}.el.ed,.el.ed *{-webkit-user-select:text;user-select:text}.el.ed .in{outline:0;cursor:text}.mq{position:fixed;border:1px solid #2b7fff;background:rgba(43,127,255,.12);z-index:80;pointer-events:none}#mm.on{background:var(--ac);color:#fff;border-color:var(--ac)}#cv.rul-off{grid-template:1fr/1fr}#cv.rul-off .cn,#cv.rul-off #rt,#cv.rul-off #rl{display:none}';
+document.head.appendChild(st);
+function all(){return ms.length>1?ms:(sel?[sel]:[])}
+function mark(){document.querySelectorAll('.el.ms').forEach(function(n){n.classList.remove('ms')});ms.forEach(function(e){if(N[e.id])N[e.id].classList.add('ms')});if(ms.length>1&&fab){fab.classList.add('on');fab.querySelector('[data-a=c]').hidden=true}}
+var _s=select;select=function(e){if(!keep)ms=[];_s(e);mark()};
+function setMs(l){if(l.length<2){select(l[0]||null);return}keep=1;ms=l;select(null);keep=0;mark()}
+function toggle(el){var l=all().slice(),i=l.indexOf(el);if(i>-1)l.splice(i,1);else l.push(el);setMs(l)}
+/* multi-selection inspector */
+var _i=insp;insp=function(){if(ms.length<2){_i();return}
+ rp.innerHTML='<h3>'+ms.length+' elements selected</h3><div class="r"><button data-m="copy">Copy</button><button data-m="cut">Cut</button><button data-m="paste">Paste</button><button data-m="dup">Duplicate</button><button data-m="del">Delete</button></div><div class="r"><button data-m="cs">Copy style</button><button data-m="ps">Paste style</button><button data-m="fr">Front</button><button data-m="bk">Back</button></div><h3>Align</h3><div class="r"><button data-m="l">Left</button><button data-m="c">Centre</button><button data-m="r">Right</button><button data-m="t">Top</button><button data-m="mi">Middle</button><button data-m="b">Bottom</button></div><h3>Set on all</h3><label>Font<select data-mk="font"><option value="">—</option>'+FN.map(function(f){return'<option>'+f+'</option>'}).join('')+'</select></label><label>Size pt<input type="number" data-mk="size" step=".5"></label><label>Text color<input type="color" data-mk="color"></label><label>Opacity %<input type="number" data-mk="op" step="1"></label><p style="opacity:.65">Shift-click, drag a box on empty canvas, or Ctrl+A to select. Ctrl+C / V copies elements; Ctrl+Alt+C / V copies style.</p>'};
+rp.addEventListener('input',function(ev){var k=ev.target.dataset.mk;if(!k||ms.length<2)return;var v=ev.target.value;if(v==='')return;if(ev.target.type=='number')v=parseFloat(v);ms.forEach(function(e){if(k=='op'||TX.indexOf(e.t)>-1){e[k]=v;paint(e)}})});
+rp.addEventListener('change',function(ev){if(ev.target.dataset.mk)commit()});
+/* actions */
+function copy(){CB=all().filter(function(e){return!e.fo}).map(function(e){return JSON.parse(JSON.stringify(e))});pc=0}
+function paste(){if(!CB.length)return;pc++;var n=CB.map(function(s){var c=Object.assign({},s,{id:++nid,x:s.x+.2*pc,y:s.y+.2*pc,z:++zt});S.els.push(c);mk(c);paint(c);return c});setMs(n);commit()}
+function delAll(){var l=all();if(!l.length)return;l.forEach(function(e){N[e.id].remove()});S.els=S.els.filter(function(x){return l.indexOf(x)<0});select(null);commit()}
+function cstyle(){var p=all()[0];if(!p)return;SC={};KS.forEach(function(k){SC[k]=p[k]})}
+function pstyle(){if(!SC)return;all().forEach(function(e){KS.forEach(function(k){if(TK.indexOf(k)>-1&&TX.indexOf(e.t)<0)return;if(k=='fill'&&e.t=='photo')return;e[k]=SC[k]});paint(e)});insp();commit()}
+function align(a){var l=ms,x0=Math.min.apply(0,l.map(function(e){return e.x})),x1=Math.max.apply(0,l.map(function(e){return e.x+e.w})),y0=Math.min.apply(0,l.map(function(e){return e.y})),y1=Math.max.apply(0,l.map(function(e){return e.y+e.h}));
+ l.forEach(function(e){if(a=='l')e.x=x0;if(a=='r')e.x=x1-e.w;if(a=='c')e.x=(x0+x1)/2-e.w/2;if(a=='t')e.y=y0;if(a=='b')e.y=y1-e.h;if(a=='mi')e.y=(y0+y1)/2-e.h/2;paint(e)});commit()}
+function act(a){if(a=='copy')copy();else if(a=='cut'){copy();delAll()}else if(a=='paste')paste();else if(a=='dup'){copy();paste()}else if(a=='del')delAll();else if(a=='cs')cstyle();else if(a=='ps')pstyle();
+ else if(a=='fr'){ms.forEach(function(e){e.z=++zt});ms.forEach(paint);commit()}else if(a=='bk'){var m=Math.min.apply(0,S.els.map(function(x){return x.z}));ms.forEach(function(e,i){e.z=m-1-i});ms.forEach(paint);commit()}else align(a)}
+rp.addEventListener('click',function(ev){var a=ev.target.dataset.m;if(a&&ms.length>1)act(a)});
+if(fab)fab.addEventListener('click',function(ev){var a=ev.target.dataset.a;if(ms.length>1&&(a=='d'||a=='x')){ev.stopPropagation();act(a=='d'?'dup':'del')}},true);
+/* clipboard section + multi toggle + select all */
+var sec=document.createElement('details');sec.className='sec';sec.open=true;
+sec.innerHTML='<summary>Clipboard &amp; selection</summary><div class="r"><button data-m="copy">Copy element</button><button data-m="paste">Paste element</button><button data-m="cs">Copy style</button><button data-m="ps">Paste style</button><button data-m="all">Select all</button></div><div style="opacity:.65">Double-click (or double-tap) text to type on the canvas. Shift-click or drag a box to select several.</div>';
+$('#tab_d').insertBefore(sec,$('#tab_d').firstChild);
+sec.onclick=function(e){var a=e.target.dataset.m;if(a=='all')setMs(S.els.filter(function(x){return!x.fo}));else if(a)act(a)};
+var mm=document.createElement('button');mm.id='mm';mm.textContent='Multi';mm.title='Tap elements to add/remove from selection';
+mm.onclick=function(){multi=!multi;mm.classList.toggle('on',multi)};$('#top').insertBefore(mm,$('#top .g').nextSibling);
+/* on-canvas text editing */
+function edit(e){if(ed)endEdit();select(e);var n=N[e.id],i=n.firstChild;ed=e;i.innerHTML=esc(e.text);try{i.contentEditable='plaintext-only'}catch(x){}if(i.contentEditable!='plaintext-only')i.contentEditable='true';n.classList.add('ed');i.focus();
+ var r=document.createRange();r.selectNodeContents(i);var g=getSelection();g.removeAllRanges();g.addRange(r);i.onblur=endEdit}
+function endEdit(){if(!ed)return;var e=ed,n=N[e.id];ed=null;if(!n)return;var i=n.firstChild;i.onblur=null;e.text=(i.children.length?i.innerText:i.textContent).replace(/\n$/,'');i.contentEditable='false';n.classList.remove('ed');paint(e);insp();layers();commit()}
+sc.addEventListener('dblclick',function(e){var n=e.target.closest('.el'),el=n&&E(n.id.slice(1));if(el&&TX.indexOf(el.t)>-1){e.stopPropagation();e.preventDefault()}},true);
+/* pointer: modifier toggle, double-tap edit, group drag, marquee */
+sc.addEventListener('pointerdown',function(ev){if(pg.classList.contains('crop')||ev.target.closest('.hd,.gd'))return;
+ var n=ev.target.closest('.el'),el=n&&E(n.id.slice(1));
+ if(ed){if(el===ed){ev.stopPropagation();return}endEdit()}
+ if(!n){if(ev.pointerType=='mouse'&&!ev.button){var r=sc.getBoundingClientRect();if(ev.clientX<r.right-16&&ev.clientY<r.bottom-16){mq={x:ev.clientX,y:ev.clientY,base:ev.shiftKey?all().slice():[],d:document.createElement('div'),m:0};mq.d.className='mq'}}return}
+ if(ev.shiftKey||ev.ctrlKey||ev.metaKey||multi){ev.stopPropagation();ev.preventDefault();toggle(el);return}
+ var now=Date.now();
+ if(lt.id===el.id&&now-lt.t<350&&TX.indexOf(el.t)>-1&&!el.fo){ev.stopPropagation();ev.preventDefault();lt={};edit(el);return}
+ lt={id:el.id,t:now};
+ if(ms.length>1&&ms.indexOf(el)>-1){ev.stopPropagation();ev.preventDefault();var o=ms.map(function(e){return{e:e,x:e.x,y:e.y}}),sx=ev.clientX,sy=ev.clientY,k=PX*z,mo=0;
+  var mvf=function(m){var dx=(m.clientX-sx)/k,dy=(m.clientY-sy)/k;if(Math.abs(dx)+Math.abs(dy)>.01)mo=1;o.forEach(function(a){a.e.x=a.x+dx;a.e.y=a.y+dy;paint(a.e)})},upf=function(){removeEventListener('pointermove',mvf);removeEventListener('pointerup',upf);if(mo)commit()};
+  addEventListener('pointermove',mvf);addEventListener('pointerup',upf)}
+},true);
+addEventListener('pointermove',function(ev){if(!mq)return;var dx=ev.clientX-mq.x,dy=ev.clientY-mq.y;if(!mq.m&&Math.hypot(dx,dy)>4){mq.m=1;document.body.appendChild(mq.d);document.body.style.userSelect='none'}
+ if(mq.m){var s=mq.d.style;s.left=Math.min(ev.clientX,mq.x)+'px';s.top=Math.min(ev.clientY,mq.y)+'px';s.width=Math.abs(dx)+'px';s.height=Math.abs(dy)+'px'}});
+addEventListener('pointerup',function(ev){if(!mq)return;var q=mq;mq=null;document.body.style.userSelect='';if(!q.m)return;q.d.remove();
+ var x0=Math.min(ev.clientX,q.x),x1=Math.max(ev.clientX,q.x),y0=Math.min(ev.clientY,q.y),y1=Math.max(ev.clientY,q.y);
+ var l=S.els.filter(function(e){if(e.fo||!N[e.id])return false;var r=N[e.id].getBoundingClientRect();return r.left<x1&&r.right>x0&&r.top<y1&&r.bottom>y0});
+ q.base.forEach(function(e){if(l.indexOf(e)<0)l.push(e)});setMs(l)});
+/* keyboard */
+document.addEventListener('keydown',function(e){var t=e.target;if(t.isContentEditable){e.stopPropagation();if(e.key=='Escape')t.blur();return}
+ if(/INPUT|TEXTAREA|SELECT/.test(t.tagName))return;var c=e.ctrlKey||e.metaKey,cd=e.code,L=all(),h=0;
+ if(c&&cd=='KeyA'){setMs(S.els.filter(function(x){return!x.fo}));h=1}
+ else if(c&&e.altKey&&cd=='KeyC'){cstyle();h=1}else if(c&&e.altKey&&cd=='KeyV'){pstyle();h=1}
+ else if(c&&cd=='KeyC'&&L.length){copy();h=1}else if(c&&cd=='KeyX'&&L.length){copy();delAll();h=1}else if(c&&cd=='KeyV'&&CB.length){paste();h=1}
+ else if(e.key=='Escape'&&ms.length){select(null);h=1}
+ else if(ms.length>1){var d=e.shiftKey?.1:.01;
+  if(e.key=='Delete'||e.key=='Backspace'){delAll();h=1}else if(c&&cd=='KeyD'){act('dup');h=1}
+  else if(/^Arrow/.test(e.key)){ms.forEach(function(m){if(e.key=='ArrowLeft')m.x-=d;if(e.key=='ArrowRight')m.x+=d;if(e.key=='ArrowUp')m.y-=d;if(e.key=='ArrowDown')m.y+=d;paint(m)});commit();h=1}}
+ if(h){e.preventDefault();e.stopPropagation()}},true);
+/* ruler toggle */
+var pop=$('#vd .pop'),lb=document.createElement('label');lb.innerHTML='<input type="checkbox" id="rv" checked>Rulers';pop.insertBefore(lb,pop.firstChild);
+function rv(on){$('#cv').classList.toggle('rul-off',!on);$('#rv').checked=on;try{localStorage.setItem('rv',on?1:0)}catch(x){}ruls()}
+$('#rv').onchange=function(){rv(this.checked)};try{if(localStorage.getItem('rv')==='0')rv(false)}catch(x){}
+})();
 </script>
 </body>
 </html>
