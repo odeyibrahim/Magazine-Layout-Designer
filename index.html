@@ -3941,7 +3941,7 @@ function closeAll(){open_().forEach(function(p){p.classList.remove('on')});sched
 document.addEventListener('click',function(ev){var b=ev.target.closest&&ev.target.closest('.pn40 [data-x]');if(!b)return;var p=b.closest('.pn40');setTimeout(function(){if(p)p.classList.remove('on');sched()},0)},true);
 document.addEventListener('keydown',function(ev){if(ev.key!=='Escape')return;var t=ev.target;if(t&&/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)&&!t.closest('.pn40'))return;if(open_().length){closeAll()}},true);
 /* nothing selected -> no stranded panel */
-setInterval(function(){if(!open_().length)return;var has=false;try{has=!!(typeof sel!=='undefined'&&sel)||(window.L40&&L40.selList&&L40.selList().length>0)}catch(e){}if(!has)closeAll()},350);
+setInterval(function(){var need=open_().filter(function(p){return p.id!=='grp40'});if(!need.length)return;var has=false;try{has=!!(typeof sel!=='undefined'&&sel)||(window.L40&&L40.selList&&L40.selList().length>0)}catch(e){}if(!has)need.forEach(function(p){p.classList.remove('on')});sched()},350);
 /* a lost pointer (touch scroll takeover, tab switch) must not leave a drag running */
 function endDrag(){try{window.dispatchEvent(new PointerEvent('pointerup',{bubbles:true}))}catch(e){}}
 addEventListener('pointercancel',endDrag,true);addEventListener('blur',endDrag);document.addEventListener('visibilitychange',function(){if(document.hidden)endDrag()});
